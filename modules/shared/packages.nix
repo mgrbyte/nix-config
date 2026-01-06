@@ -19,6 +19,9 @@ with pkgs; [
   keychain
   libfido2
 
+  # LLMs
+  claude-code
+
   # Cloud-related tools and SDKs
   docker
   docker-compose
