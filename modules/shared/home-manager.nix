@@ -168,7 +168,7 @@ let name = "Matt Russell";
       user = {
         name = name;
         email = email;
-        signingkey = "4D553E52EF7C8655";
+        signingkey = "AC61E672F0A921B7";
       };
       alias = {
         ci = "commit";
