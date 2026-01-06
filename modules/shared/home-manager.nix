@@ -168,7 +168,7 @@ let name = "Matt Russell";
       user = {
         name = name;
         email = email;
-        signingkey = "AC61E672F0A921B7";
+        signingkey = "4D553E52EF7C8655";
       };
       alias = {
         ci = "commit";
@@ -318,10 +318,10 @@ let name = "Matt Russell";
         identitiesOnly = true;
         identityFile = [
           (lib.mkIf pkgs.stdenv.hostPlatform.isLinux
-            "/home/${user}/.ssh/id_github"
+            "/home/${user}/.ssh/id_mtr21pqh_github"
           )
           (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin
-            "/Users/${user}/.ssh/id_github"
+            "/Users/${user}/.ssh/id_mtr21pqh_github"
           )
         ];
       };

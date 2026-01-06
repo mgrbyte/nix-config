@@ -3,35 +3,56 @@
 let user = "mtr21pqh"; in
 {
   age.identityPaths = [
-    "/Users/${user}/.ssh/id_ed25519"
+    "/Users/${user}/.ssh/id_ed25519_agenix"
   ];
 
-  # Your secrets go here
-  #
-  # Note: the installWithSecrets command you ran to boostrap the machine actually copies over
-  #       a Github key pair. However, if you want to store the keypair in your nix-secrets repo
-  #       instead, you can reference the age files and specify the symlink path here. Then add your
-  #       public key in shared/files.nix.
-  #
-  #       If you change the key name, you'll need to update the SSH configuration in shared/home-manager.nix
-  #       so Github reads it correctly.
+  # GitHub SSH key
+  age.secrets."id_mtr21pqh_github" = {
+    symlink = true;
+    path = "/Users/${user}/.ssh/id_mtr21pqh_github";
+    file = "${secrets}/id_mtr21pqh_github.age";
+    mode = "600";
+    owner = "${user}";
+    group = "staff";
+  };
 
-  #
-  # age.secrets."github-ssh-key" = {
-  #   symlink = true;
-  #   path = "/Users/${user}/.ssh/id_github";
-  #   file =  "${secrets}/github-ssh-key.age";
-  #   mode = "600";
-  #   owner = "${user}";
-  #   group = "staff";
-  # };
+  # Main SSH key
+  age.secrets."id_ed25519_mtr21pqh" = {
+    symlink = true;
+    path = "/Users/${user}/.ssh/id_ed25519_mtr21pqh";
+    file = "${secrets}/id_ed25519_mtr21pqh.age";
+    mode = "600";
+    owner = "${user}";
+    group = "staff";
+  };
 
-  # age.secrets."github-signing-key" = {
-  #   symlink = false;
-  #   path = "/Users/${user}/.ssh/pgp_github.key";
-  #   file =  "${secrets}/github-signing-key.age";
-  #   mode = "600";
-  #   owner = "${user}";
-  # };
+  # Work environment (API keys)
+  age.secrets."work.env" = {
+    symlink = true;
+    path = "/Users/${user}/.work.env";
+    file = "${secrets}/work.env.age";
+    mode = "600";
+    owner = "${user}";
+    group = "staff";
+  };
 
+  # HuggingFace token
+  age.secrets."huggingface-token" = {
+    symlink = true;
+    path = "/Users/${user}/.cache/huggingface/token";
+    file = "${secrets}/huggingface-token.age";
+    mode = "600";
+    owner = "${user}";
+    group = "staff";
+  };
+
+  # GPG private key
+  age.secrets."gpg-private-key" = {
+    symlink = false;
+    path = "/Users/${user}/.gnupg/private-keys-v1.d/gpg-private.key";
+    file = "${secrets}/gpg-private-key.age";
+    mode = "600";
+    owner = "${user}";
+    group = "staff";
+  };
 }
