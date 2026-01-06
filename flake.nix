@@ -124,5 +124,14 @@
           ./hosts/nixos
         ];
      });
+
+      # Standalone Home Manager for Ubuntu/other Linux (not NixOS)
+      homeConfigurations = nixpkgs.lib.genAttrs linuxSystems (system:
+        home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.${system};
+          extraSpecialArgs = inputs;
+          modules = [ ./modules/standalone/home.nix ];
+        }
+      );
   };
 }
