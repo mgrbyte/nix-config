@@ -1,6 +1,9 @@
-{ pkgs, config, emacs-config, ... }:
+{ pkgs, config, lib, emacs-config, ... }:
 
 {
+  # Clojure deps.edn - development aliases and tools
+  ".clojure/deps.edn".source = ./config/deps.edn;
+
   # Emacs configuration from github:mgrbyte/emacs.d
   ".emacs.d/init.el".source = "${emacs-config}/init.el";
   ".emacs.d/lisp" = {

@@ -2,7 +2,7 @@
 
 let
   user = "mtr21pqh";
-  sharedFiles = import ../shared/files.nix { inherit config pkgs emacs-config; };
+  sharedFiles = import ../shared/files.nix { inherit config pkgs lib emacs-config; };
   additionalFiles = import ./files.nix { inherit user config pkgs; };
 in
 {
