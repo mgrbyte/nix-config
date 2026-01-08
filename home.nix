@@ -146,6 +146,19 @@ in
     enableCompletion = true;
     cdpath = [ "~/Projects" ];
 
+    # History settings (declarative - generates setopt commands)
+    history = {
+      size = 10000;
+      save = 10000;
+      share = true;                  # SHARE_HISTORY
+      ignoreDups = true;             # HIST_IGNORE_DUPS
+      ignoreAllDups = true;          # HIST_IGNORE_ALL_DUPS
+      ignoreSpace = true;            # HIST_IGNORE_SPACE
+      expireDuplicatesFirst = true;  # HIST_EXPIRE_DUPS_FIRST
+      findNoDups = true;             # HIST_FIND_NO_DUPS
+      saveNoDups = true;             # HIST_SAVE_NO_DUPS
+    };
+
     # Environment variables (.zshenv) - sourced for ALL shells
     envExtra = ''
       # Nix daemon
@@ -175,25 +188,12 @@ in
 
       # XDG
       export XDG_CONFIG_HOME="$HOME/.config"
-
-      # History
-      export HISTIGNORE="pwd:ls:cd"
     '';
 
     # Interactive shell config (.zshrc)
     initContent = ''
       # Emacs helper
       e() { emacsclient -t "$@"; }
-
-      # Sync starship config to dot-files repo
-      sync-starship() {
-        if [[ -d ~/github/mgrbyte/dot-files/starship ]]; then
-          cp ~/.config/starship.toml ~/github/mgrbyte/dot-files/starship/starship.toml
-          echo "Synced starship config to dot-files"
-        else
-          echo "dot-files/starship directory not found"
-        fi
-      }
 
       # direnv hook
       eval "$(direnv hook zsh)"
@@ -208,6 +208,8 @@ in
       bindkey -e
       bindkey '^[^?' backward-kill-word
       bindkey '^[[3;3~' kill-word
+      bindkey '^p' history-search-backward
+      bindkey '^n' history-search-forward
 
       # Treat path segments as separate words
       WORDCHARS=''${WORDCHARS/\//}
@@ -265,6 +267,9 @@ in
       zstyle ':completion:*:(ssh|scp|rsync):*' tag-order 'hosts:-host:host hosts:-domain:domain hosts:-ipaddr:ip\ address *'
       zstyle ':completion:*:(scp|rsync):*' group-order users files all-files hosts-domain hosts-host hosts-ipaddr
       zstyle ':completion:*:ssh:*' group-order users hosts-domain hosts-host users hosts-ipaddr
+
+      # fzf-tab: preview directory contents when completing cd
+      zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
     '';
 
     shellAliases = {
@@ -292,6 +297,7 @@ in
       enable = true;
       plugins = [
         "zsh-users/zsh-autosuggestions"
+        "Aloxaf/fzf-tab"
         "ohmyzsh/ohmyzsh path:lib/git.zsh"
       ];
     };
