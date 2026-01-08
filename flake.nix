@@ -44,7 +44,7 @@
         modules = [
           nix-colors.homeManagerModules.default
           inputs.home-manager-secrets.homeManagerModules.home-manager-secrets
-          ./home.nix
+          ./home
         ];
       };
     in
