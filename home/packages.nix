@@ -87,7 +87,6 @@ in {
   ] ++ (with inputs.nix-casks.packages.${pkgs.system}; [
     # macOS GUI applications via nix-casks
     visual-studio-code
-    iterm2
     raycast
     google-chrome
     cursor
