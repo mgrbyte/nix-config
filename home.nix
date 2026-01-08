@@ -56,7 +56,13 @@ in
 {
   home.username = user;
   home.homeDirectory = homeDir;
-  home.stateVersion = "23.11";
+  home.stateVersion = "26.05";
+
+  # Disable copyApps - requires App Management permission which is problematic
+  # Living with shortcut arrow on dock icons instead
+  targets.darwin.copyApps.enable = false;
+
+  # Note: With stateVersion >= 26.05 and xdg.enable = true, zsh config moves to ~/.config/zsh
 
   # Color scheme from nix-colors (base16)
   # See available schemes: https://github.com/tinted-theming/schemes
@@ -151,7 +157,9 @@ in
 
     # Platform-specific pinentry
     (if isDarwin then pinentry_mac else pinentry-curses)
-  ] ++ lib.optionals isDarwin (with inputs.nix-casks.packages.${pkgs.system}; [
+  ] ++ lib.optionals isDarwin ([
+    pkgs.dockutil  # Dock management tool
+  ] ++ (with inputs.nix-casks.packages.${pkgs.system}; [
     # macOS GUI applications via nix-casks
     visual-studio-code
     iterm2
@@ -159,7 +167,7 @@ in
     google-chrome
     cursor
     postman
-  ]);
+  ]));
 
   # ==========================================================================
   # FILES
@@ -190,12 +198,14 @@ in
     ".config/alacritty/alacritty.toml".text = let
       p = config.colorScheme.palette;
     in ''
-      # Window padding (margins)
+      # Window configuration
       [window]
+      dimensions = { columns = 207, lines = 58 }
       padding = { x = 12, y = 12 }
       decorations = "Full"
       opacity = 1.0
       option_as_alt = "Both"
+      startup_mode = "Windowed"
 
       # Font configuration
       [font]
@@ -294,6 +304,9 @@ in
       </dict>
       </plist>
     '';
+
+    # Powerlevel10k prompt configuration
+    ".p10k.zsh".source = ./p10k.zsh;
   };
 
   # ==========================================================================
@@ -434,6 +447,10 @@ in
     '';
 
     shellAliases = {
+      # Home Manager (flake-based)
+      home-manager = "nix run home-manager -- --flake ~/github/mgrbyte/nix-config";
+      hm-switch = "home-manager switch --flake ~/github/mgrbyte/nix-config#mtr21pqh";
+
       # Ripgrep
       search = "rg -p --glob '!node_modules/*'";
       rg-clj = "rg --type=clojure";
@@ -718,7 +735,7 @@ in
   home.activation.createAppAliases = lib.mkIf isDarwin (
     lib.hm.dag.entryAfter ["writeBoundary"] ''
       # Create Finder aliases in /Applications so Spotlight can find nix apps
-      for app in Alacritty; do
+      for app in Alacritty Emacs; do
         if [[ -e "$HOME/.nix-profile/Applications/$app.app" ]]; then
           # Remove existing aliases (handles both "App.app" and "App.app alias" variants)
           rm -f "/Applications/$app.app" "/Applications/$app.app alias" 2>/dev/null || true
@@ -730,6 +747,82 @@ in
           fi
         fi
       done
+    ''
+  );
+
+  # ==========================================================================
+  # DARWIN-ONLY: Create Emacsclient.app wrapper (real files, not symlinks)
+  # ==========================================================================
+  home.activation.createEmacsclientApp = lib.mkIf isDarwin (
+    lib.hm.dag.entryAfter ["writeBoundary"] ''
+      APP_DIR="$HOME/Applications/Emacsclient.app"
+      CONTENTS="$APP_DIR/Contents"
+
+      # Create directory structure
+      mkdir -p "$CONTENTS/MacOS" "$CONTENTS/Resources"
+
+      # Write Info.plist
+      cat > "$CONTENTS/Info.plist" << 'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleExecutable</key>
+  <string>Emacsclient</string>
+  <key>CFBundleIconFile</key>
+  <string>Emacs</string>
+  <key>CFBundleIdentifier</key>
+  <string>org.gnu.Emacsclient</string>
+  <key>CFBundleName</key>
+  <string>Emacsclient</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleVersion</key>
+  <string>1.0</string>
+</dict>
+</plist>
+PLIST
+
+      # Write executable (note: EMACSCLIENT_PATH is set by nix interpolation)
+      EMACSCLIENT_PATH="${pkgs.emacs}/bin/emacsclient"
+      cat > "$CONTENTS/MacOS/Emacsclient" << EXEC
+#!/bin/bash
+exec "$EMACSCLIENT_PATH" -c "\$@"
+EXEC
+      chmod +x "$CONTENTS/MacOS/Emacsclient"
+
+      # Copy icon (real file, not symlink)
+      cp -f "${pkgs.emacs}/Applications/Emacs.app/Contents/Resources/Emacs.icns" "$CONTENTS/Resources/Emacs.icns"
+
+      # Touch the app to update modification time (helps with icon cache)
+      touch "$APP_DIR"
+    ''
+  );
+
+  # ==========================================================================
+  # DARWIN-ONLY: Add apps to Dock
+  # ==========================================================================
+  home.activation.configureDock = lib.mkIf isDarwin (
+    lib.hm.dag.entryAfter ["createAppAliases" "createEmacsclientApp"] ''
+      DOCKUTIL="${pkgs.dockutil}/bin/dockutil"
+      CHANGED=0
+
+      # Add Alacritty to dock (use actual nix-profile path, not alias)
+      if ! "$DOCKUTIL" --find Alacritty >/dev/null 2>&1; then
+        "$DOCKUTIL" --add "$HOME/.nix-profile/Applications/Alacritty.app" --no-restart >/dev/null 2>&1 || true
+        CHANGED=1
+      fi
+
+      # Add Emacsclient from ~/Applications (Emacs runs as daemon, so only need client)
+      if ! "$DOCKUTIL" --find Emacsclient >/dev/null 2>&1; then
+        "$DOCKUTIL" --add "$HOME/Applications/Emacsclient.app" --no-restart >/dev/null 2>&1 || true
+        CHANGED=1
+      fi
+
+      # Restart dock only if we made changes
+      if [[ $CHANGED -eq 1 ]]; then
+        killall Dock 2>/dev/null || true
+      fi
     ''
   );
 
