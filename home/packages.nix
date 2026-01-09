@@ -67,6 +67,7 @@ in {
     lazygit
     markdownlint-cli2
     nodejs_24
+    oh-my-posh
     ripgrep
     terraform
     tmux

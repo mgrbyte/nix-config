@@ -56,8 +56,8 @@
 
     # Interactive shell config (.zshrc)
     initContent = ''
-      # Powerlevel10k prompt config
-      [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+      # Oh-my-posh prompt
+      eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/config.json)"
 
       # Emacs helper
       e() { emacsclient -t "$@"; }
@@ -167,7 +167,6 @@
     antidote = {
       enable = true;
       plugins = [
-        "romkatv/powerlevel10k"
         "zsh-users/zsh-autosuggestions"
         "Aloxaf/fzf-tab"
         "ohmyzsh/ohmyzsh path:lib/git.zsh"
@@ -181,6 +180,6 @@
     defaultOptions = [ "--height=40%" "--layout=reverse" "--border" ];
   };
 
-  # Powerlevel10k prompt configuration
-  home.file.".p10k.zsh".source = ../p10k.zsh;
+  # Oh-my-posh prompt configuration
+  home.file.".config/oh-my-posh/config.json".source = ../oh-my-posh.json;
 }
