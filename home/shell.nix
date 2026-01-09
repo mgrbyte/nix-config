@@ -50,6 +50,9 @@
       # XDG
       export XDG_CONFIG_HOME="$HOME/.config"
 
+      # UV package manager config
+      export UV_CONFIG="$HOME/.config/uv/uv.toml"
+
       # Hunspell dictionaries (Welsh + English)
       export DICPATH="$HOME/.local/share/hunspell:${pkgs.hunspellDicts.en-gb-ise}/share/hunspell"
     '';
