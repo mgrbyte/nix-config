@@ -86,8 +86,10 @@
 
       # SSH key management via keychain
       # Explicitly list keys since homeage symlinks don't work with grep
+      # Use fixed socket path so emacs daemon can find it
       if command -v keychain &>/dev/null; then
         keychain --quick --quiet --nogui \
+          --ssh-agent-socket ~/.ssh/agent.sock \
           ~/.ssh/id_ed25519_agenix \
           ~/.ssh/id_mtr21pqh_github \
           ~/.ssh/id_ed25519_mtr21pqh
@@ -156,6 +158,7 @@
       rg-toml = "search --type=toml";
       rg-ts = "search --type=typescript";
 
+      keychain = "keychain --nocolor";
       # ls
       ls = "ls --color=auto";
       ll = "ls -lh";

@@ -3,6 +3,11 @@
 let
   isDarwin = pkgs.stdenv.isDarwin;
 in {
+  # Clear stale native-compiled elisp on config change
+  home.activation.clearElnCache = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    find ~/.emacs.d/eln-cache/ -type f -name '*mgrbyte*' -delete 2>/dev/null || true
+  '';
+
   # Emacs configuration files from github:mgrbyte/emacs.d
   home.file = {
     ".emacs.d/init.el".source = "${emacs-config}/init.el";
@@ -28,6 +33,7 @@ in {
       EnvironmentVariables = {
         PATH = nixPath;
         CLAUDE_TIPS_FILE = "${homeDir}/.claude/tips.txt";
+        SSH_AUTH_SOCK = "${homeDir}/.ssh/agent.sock";
       };
     };
   };
