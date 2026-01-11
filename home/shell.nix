@@ -59,6 +59,9 @@
 
     # Interactive shell config (.zshrc)
     initContent = ''
+      # Don't suggest commands that start with space (security: space-prefixed commands are private)
+      ZSH_AUTOSUGGEST_HISTORY_IGNORE="( *)"
+
       # Oh-my-posh prompt
       eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/config.json)"
 
