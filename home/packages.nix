@@ -96,6 +96,7 @@ in {
     dirvish
     dockerfile-mode
     editorconfig
+    envrc
     exec-path-from-shell
     f
     flycheck-clj-kondo
