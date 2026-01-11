@@ -149,21 +149,23 @@
 
     shellAliases = {
       # Home Manager (flake-based)
-      home-manager = "nix run home-manager -- --flake '$HOME/github/mgrbyte/nix-config'";
+      home-manager = "nix run home-manager -- --flake '${homeDir}/github/mgrbyte/nix-config'";
       hm-switch = "nix run home-manager -- switch --flake '${homeDir}/github/mgrbyte/nix-config#mtr21pqh'";
       hm-emacs-update = "cd ${homeDir}/github/mgrbyte/nix-config && nix run home-manager -- switch --flake '.#mtr21pqh' --override-input emacs-config path:${homeDir}/github/mgrbyte/emacs.d && launchctl kickstart -k gui/$(id -u)/org.nix-community.home.emacs";
 
       # Ripgrep
       search = "rg -p --glob '!node_modules/*'";
       rg-clj = "search --type=clojure";
+      rg-elisp = "search --type=elisp";
       rg-j2 = "search --type=jinja";
+      rg-jsonl = "search --type=jsonl";
+      rg-ini = "search --type=ini";
       rg-md = "search --type=markdown";
       rg-py = "search --type=python";
       rg-toml = "search --type=toml";
       rg-ts = "search --type=typescript";
 
       keychain = "keychain --nocolor";
-      # ls
       ls = "ls --color=auto";
       ll = "ls -lh";
       l = "ls -l";
