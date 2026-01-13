@@ -55,6 +55,7 @@ in {
 
     # development tools / text utils
     awscli2
+    cmake
     curl
     difftastic
     fzf
@@ -64,6 +65,7 @@ in {
     kubectl
     lazygit
     markdownlint-cli2
+    pandoc
     nodejs_24
     oh-my-posh
     ripgrep

@@ -10,6 +10,8 @@ in {
     ignores = [
       "*.swp"
       "*~"
+      "#*#"
+      ".#*"
       ".dir-locals.el"
       ".serena/"
       ".idea/**/aws.xml"
