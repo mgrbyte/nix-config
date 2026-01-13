@@ -56,6 +56,7 @@ in {
     # development tools / text utils
     awscli2
     cmake
+    libtool
     curl
     difftastic
     fzf
