@@ -28,11 +28,8 @@
         . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
       fi
 
-      # PATH with nix-profile first
+      # PATH - defined in default.nix (single source of truth)
       export PATH="${nixPath}"
-      export PATH="$HOME/.pnpm-packages/bin:$HOME/.pnpm-packages:$PATH"
-      export PATH="$HOME/.npm-packages/bin:$HOME/bin:$PATH"
-      export PATH="$HOME/.local/share/bin:$PATH"
 
       # Editor
       export ALTERNATE_EDITOR=""

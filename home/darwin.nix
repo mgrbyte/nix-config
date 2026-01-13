@@ -118,4 +118,13 @@ EXEC
       fi
     ''
   );
+
+  # Provide glibtool for vterm compilation (macOS expects glibtool, nix provides libtool)
+  home.file.".local/bin/glibtool" = lib.mkIf isDarwin {
+    executable = true;
+    text = ''
+      #!/bin/bash
+      exec ${pkgs.libtool}/bin/libtool "$@"
+    '';
+  };
 }

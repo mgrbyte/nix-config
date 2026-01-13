@@ -7,7 +7,24 @@ let
   isDarwin = pkgs.stdenv.isDarwin;
   isLinux = pkgs.stdenv.isLinux;
   homeDir = if isDarwin then "/Users/${user}" else "/home/${user}";
-  nixPath = "${homeDir}/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+
+  # PATH components - single source of truth for shell and launchd
+  userPaths = [
+    "${homeDir}/.local/bin"
+    "${homeDir}/.pnpm-packages/bin"
+    "${homeDir}/.npm-packages/bin"
+    "${homeDir}/bin"
+  ];
+  systemPaths = [
+    "${homeDir}/.nix-profile/bin"
+    "/nix/var/nix/profiles/default/bin"
+    "/usr/local/bin"
+    "/usr/bin"
+    "/bin"
+    "/usr/sbin"
+    "/sbin"
+  ];
+  nixPath = lib.concatStringsSep ":" (userPaths ++ systemPaths);
 in {
   imports = [
     ./packages.nix
@@ -30,7 +47,7 @@ in {
   home.homeDirectory = homeDir;
   home.stateVersion = "26.05";
 
-  colorScheme = nix-colors.colorSchemes.dracula;
+  colorScheme = nix-colors.colorSchemes.tokyo-night-terminal-dark;
 
   programs.home-manager.enable = true;
   nixpkgs.config.allowUnfree = true;
