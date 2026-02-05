@@ -1,4 +1,4 @@
-{ config, pkgs, lib, name, email, user, ... }:
+{ config, pkgs, lib, name, email, user, homeDir, ... }:
 
 let
   isDarwin = pkgs.stdenv.isDarwin;
@@ -57,9 +57,9 @@ in {
       user = {
         name = name;
         email = email;
-        signingkey = "AC61E672F0A921B7";
       };
       alias = {
+        bcu = "!git fetch -p && git branch --merged | grep -v '\\*\\|main\\|master' | xargs -n 1 git branch -D";
         br = "branch";
         cb = "checkout -b";
         chp = "cherry-pick";
@@ -91,10 +91,23 @@ in {
         username = "oauth";
         helper = "netrc";
       };
+      # SSH commit signing (replacing GPG)
       commit.gpgsign = true;
       tag.gpgsign = true;
+      gpg.format = "ssh";
+      gpg.ssh.allowedSignersFile = "${homeDir}/.ssh/allowed_signers";
       pull.rebase = true;
       rebase.autoStash = true;
+      # Directory-based signing keys
+      "includeIf \"gitdir:${homeDir}/github/mgrbyte/\"" = {
+        path = "${homeDir}/.config/git/personal.inc";
+      };
+      "includeIf \"gitdir:${homeDir}/gitlab/\"" = {
+        path = "${homeDir}/.config/git/work.inc";
+      };
+      "includeIf \"gitdir:${homeDir}/github/techiaith/\"" = {
+        path = "${homeDir}/.config/git/work.inc";
+      };
     };
   };
 
@@ -117,4 +130,15 @@ in {
       };
     };
   };
+
+  # Git config includes for directory-based signing keys
+  home.file.".config/git/personal.inc".text = ''
+    [user]
+      signingkey = ${homeDir}/.ssh/id_mtr21pqh_github.pub
+  '';
+
+  home.file.".config/git/work.inc".text = ''
+    [user]
+      signingkey = ${homeDir}/.ssh/id_ed25519_mtr21pqh.pub
+  '';
 }

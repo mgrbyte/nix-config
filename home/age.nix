@@ -1,8 +1,6 @@
 { config, pkgs, lib, homeDir, nix-secrets, hunspell-cy, ... }:
 
-let
-  isDarwin = pkgs.stdenv.isDarwin;
-in {
+{
   secrets = {
     # The age identity file used to decrypt secrets
     identityPaths = [ "${homeDir}/.ssh/id_ed25519_agenix" ];
@@ -24,11 +22,9 @@ in {
         source = "${nix-secrets}/ssh-config-external.age";
         symlinks = [ "${homeDir}/.ssh/config_external" ];
       };
-      "gpg-private-key" = {
-        source = "${nix-secrets}/gpg-private-key.age";
-      };
       "huggingface-token" = {
         source = "${nix-secrets}/huggingface-token.age";
+        symlinks = [ "${homeDir}/.cache/huggingface/token" ];
       };
       "work-env" = {
         source = "${nix-secrets}/work.env.age";
@@ -37,6 +33,17 @@ in {
       "uv-config" = {
         source = "${nix-secrets}/uv.toml.age";
         symlinks = [ "${homeDir}/.config/uv/uv.toml" ];
+      };
+      "netrc-work" = {
+        source = "${nix-secrets}/netrc-work.age";
+        symlinks = [ "${homeDir}/.netrc" ];
+      };
+      "netrc-personal" = {
+        source = "${nix-secrets}/netrc-personal.age";
+      };
+      "allowed-signers" = {
+        source = "${nix-secrets}/allowed-signers.age";
+        symlinks = [ "${homeDir}/.ssh/allowed_signers" ];
       };
     };
   };
@@ -48,14 +55,9 @@ in {
   home.file.".local/share/hunspell/cy_GB.dic".source = "${hunspell-cy}/cy_GB.dic";
   home.file.".local/share/hunspell/cy_GB.aff".source = "${hunspell-cy}/cy_GB.aff";
 
-  # GPG agent configuration with nix-managed pinentry path
-  home.file.".gnupg/gpg-agent.conf".text = ''
-    enable-ssh-support
-    default-cache-ttl 34560000
-    max-cache-ttl 34560000
-    pinentry-program ${if isDarwin
-      then "${pkgs.pinentry_mac}/bin/pinentry-mac"
-      else "${pkgs.pinentry-curses}/bin/pinentry-curses"}
-    allow-emacs-pinentry
-  '';
+  # Secret rotation helper
+  home.file.".local/bin/update-secret" = {
+    source = ../scripts/update-secret;
+    executable = true;
+  };
 }

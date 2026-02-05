@@ -52,6 +52,11 @@
 
       # Hunspell dictionaries (Welsh + English)
       export DICPATH="$HOME/.local/share/hunspell:${pkgs.hunspellDicts.en-gb-ise}/share/hunspell"
+
+      # HuggingFace token
+      if [[ -r "$HOME/.secrets/huggingface-token" ]]; then
+        export HF_TOKEN="$(cat $HOME/.secrets/huggingface-token)"
+      fi
     '';
 
     # Interactive shell config (.zshrc)
@@ -99,6 +104,14 @@
       # Load work environment (API keys)
       if [[ -e "$HOME/.work.env" ]]; then
         source "$HOME/.work.env"
+      fi
+
+      # Check for broken uv tools (silent unless broken)
+      if [[ -x "$HOME/.local/bin/sync-uv-tools" ]]; then
+        broken=$("$HOME/.local/bin/sync-uv-tools" 2>/dev/null | grep "^Broken:" | cut -d: -f2 | tr -d ' ')
+        if [[ -n "$broken" && "$broken" != "none" ]]; then
+          echo "⚠ Broken uv tools detected. Run: sync-uv-tools"
+        fi
       fi
 
       # === Completion options (from zprezto) ===
