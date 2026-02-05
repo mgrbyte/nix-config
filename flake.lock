@@ -35,11 +35,11 @@
     "emacs-config": {
       "flake": false,
       "locked": {
-        "lastModified": 1769371590,
-        "narHash": "sha256-Puh2CeHlHUr3xB6lRzWXUi1th4vHjDolxqMfcuinK+I=",
+        "lastModified": 1770292234,
+        "narHash": "sha256-0UXhxj3mhu/Vdz+uoke/bj2hWs7MzqETSZVBos+GWis=",
         "owner": "mgrbyte",
         "repo": "emacs.d",
-        "rev": "a96452e3883cfe968c9fe755bc9cf4eb059eea12",
+        "rev": "4b849d60b8f4737d24d583ec9fcbe04eb5563020",
         "type": "github"
       },
       "original": {
@@ -184,11 +184,11 @@
     "nix-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1767949880,
-        "narHash": "sha256-3EKG1du7OOVllDXN+fPE1NPBZib2nwthVRNSn5IVW6A=",
+        "lastModified": 1770290833,
+        "narHash": "sha256-miRRV+nJKAO6T2PD5Gz1FLIBUjuwYklEe2edH21c54M=",
         "ref": "refs/heads/main",
-        "rev": "012451be3967f2a8e6345a944d5760561533f79f",
-        "revCount": 6,
+        "rev": "059030dde561eb83449c75b6681c9e9dd1eb3b86",
+        "revCount": 9,
         "type": "git",
         "url": "ssh://git@github.com/mgrbyte/nix-secrets"
       },
