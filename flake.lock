@@ -16,14 +16,30 @@
         "type": "github"
       }
     },
+    "emacs-abyss-theme": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1769371178,
+        "narHash": "sha256-3wapWZPo4QLJ+3BYlkaqnpQPHFUPvEiH8kXjjUmLwbs=",
+        "owner": "mgrbyte",
+        "repo": "emacs-abyss-theme",
+        "rev": "6eb2b5735808ea96a36fc7abf741fc3bbf1b6ee4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mgrbyte",
+        "repo": "emacs-abyss-theme",
+        "type": "github"
+      }
+    },
     "emacs-config": {
       "flake": false,
       "locked": {
-        "lastModified": 1768317383,
-        "narHash": "sha256-bCb7/5YINt9+WMvHTwUfv0t0fhbmhc0cZk21BuKJKgY=",
+        "lastModified": 1769371590,
+        "narHash": "sha256-Puh2CeHlHUr3xB6lRzWXUi1th4vHjDolxqMfcuinK+I=",
         "owner": "mgrbyte",
         "repo": "emacs.d",
-        "rev": "0bcd48d53196ee4d5d2e038406a0778b998cdd8a",
+        "rev": "a96452e3883cfe968c9fe755bc9cf4eb059eea12",
         "type": "github"
       },
       "original": {
@@ -261,6 +277,7 @@
     },
     "root": {
       "inputs": {
+        "emacs-abyss-theme": "emacs-abyss-theme",
         "emacs-config": "emacs-config",
         "home-manager": "home-manager",
         "home-manager-secrets": "home-manager-secrets",

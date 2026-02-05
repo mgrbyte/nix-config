@@ -14,6 +14,11 @@
       flake = false;
     };
 
+    emacs-abyss-theme = {
+      url = "github:mgrbyte/emacs-abyss-theme";
+      flake = false;
+    };
+
     nix-casks = {
       url = "github:atahanyorganci/nix-casks";
     };
@@ -49,6 +54,7 @@
           inherit inputs emacs-config nix-colors;
           nix-secrets = inputs.nix-secrets;
           hunspell-cy = inputs.hunspell-cy;
+          emacs-abyss-theme = inputs.emacs-abyss-theme;
         };
         modules = [
           nix-colors.homeManagerModules.default

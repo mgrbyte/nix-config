@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, emacs-config, nix-colors, nix-secrets, hunspell-cy, ... }:
+{ config, pkgs, lib, inputs, emacs-config, emacs-abyss-theme, nix-colors, nix-secrets, hunspell-cy, ... }:
 
 let
   name = "Matt Russell";
@@ -40,7 +40,7 @@ in {
 
   # Make shared variables available to all modules
   _module.args = {
-    inherit name user email homeDir nixPath emacs-config nix-secrets hunspell-cy;
+    inherit name user email homeDir nixPath emacs-config emacs-abyss-theme nix-secrets hunspell-cy;
   };
 
   home.username = user;
