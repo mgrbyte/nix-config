@@ -1,0 +1,56 @@
+#!/bin/bash
+# Detect and reinstall broken uv tools
+# A tool is "broken" if its venv references a missing Python
+
+set -euo pipefail
+
+UV_TOOL_DIR="${UV_TOOL_DIR:-$HOME/.local/share/uv/tools}"
+
+broken_tools=()
+ok_tools=()
+
+for tool_dir in "$UV_TOOL_DIR"/*/; do
+    [[ -d "$tool_dir" ]] || continue
+    tool_name=$(basename "$tool_dir")
+    pyvenv_cfg="$tool_dir/pyvenv.cfg"
+    [[ -f "$pyvenv_cfg" ]] || continue
+    # Extract the Python home directory from pyvenv.cfg
+    python_home=$(grep "^home = " "$pyvenv_cfg" | cut -d= -f2 | tr -d ' ')
+    if [[ -d "$python_home" ]]; then
+        ok_tools+=("$tool_name")
+    else
+        broken_tools+=("$tool_name")
+    fi
+done
+
+echo "OK: ${ok_tools[*]:-none}"
+echo "Broken: ${broken_tools[*]:-none}"
+
+if [[ ${#broken_tools[@]} -eq 0 ]]; then
+    echo "All tools working."
+    exit 0
+fi
+
+# Check for --yes/-y flag
+auto_yes=false
+for arg in "$@"; do
+    [[ "$arg" == "-y" || "$arg" == "--yes" ]] && auto_yes=true
+done
+
+if [[ "$auto_yes" == true ]]; then
+    REPLY=y
+else
+    echo ""
+    read -p "Reinstall ${#broken_tools[@]} broken tool(s)? [y/N] " -n 1 -r
+    echo ""
+fi
+
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    for tool in "${broken_tools[@]}"; do
+        echo "Reinstalling $tool..."
+        uv tool install "$tool" --reinstall
+    done
+    echo "Done."
+else
+    exit 1
+fi

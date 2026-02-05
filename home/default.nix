@@ -52,6 +52,12 @@ in {
   programs.home-manager.enable = true;
   nixpkgs.config.allowUnfree = true;
 
+  # Custom scripts
+  home.file.".local/bin/sync-uv-tools" = {
+    source = ../scripts/sync-uv-tools;
+    executable = true;
+  };
+
   nix = {
     package = pkgs.nix;
     settings = {

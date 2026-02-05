@@ -1,7 +1,14 @@
-{ config, pkgs, lib, inputs, ... }:
+{ config, pkgs, lib, inputs, emacs-abyss-theme, ... }:
 
 let
   isDarwin = pkgs.stdenv.isDarwin;
+
+  # Build abyss-theme from flake input
+  abyss-theme-pkg = pkgs.emacsPackages.trivialBuild {
+    pname = "abyss-theme";
+    version = "0.7.2";
+    src = emacs-abyss-theme;
+  };
 in {
   home.packages = with pkgs; [
     # General packages for development and system management
@@ -71,6 +78,7 @@ in {
     oh-my-posh
     ripgrep
     terraform
+    texliveFull
     tmux
     tree
     unrar
@@ -89,9 +97,11 @@ in {
 
     # Platform-specific pinentry
     (if isDarwin then pinentry_mac else pinentry-curses)
+  ] ++ [
+    # Emacs packages from flake inputs
+    abyss-theme-pkg
   ] ++ (with pkgs.emacsPackages; [
     # Emacs packages - all managed by nix (not MELPA)
-    abyss-theme
     clojure-mode
     company
     dash
@@ -142,7 +152,7 @@ in {
     zygospore
   ]) ++ lib.optionals isDarwin ([
     pkgs.dockutil  # Dock management tool
-  ] ++ (with inputs.nix-casks.packages.${pkgs.system}; [
+  ] ++ (with inputs.nix-casks.packages.${pkgs.stdenv.hostPlatform.system}; [
     # macOS GUI applications via nix-casks
     visual-studio-code
     raycast
