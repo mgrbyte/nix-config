@@ -60,4 +60,11 @@
     source = ../scripts/update-secret;
     executable = true;
   };
+
+  # Regenerate SSH public keys from private keys on activation
+  # This ensures .pub files always match the canonical private keys
+  home.activation.generateSshPubKeys = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    ${pkgs.openssh}/bin/ssh-keygen -y -f ${homeDir}/.ssh/id_mtr21pqh_github > ${homeDir}/.ssh/id_mtr21pqh_github.pub
+    ${pkgs.openssh}/bin/ssh-keygen -y -f ${homeDir}/.ssh/id_ed25519_mtr21pqh > ${homeDir}/.ssh/id_ed25519_mtr21pqh.pub
+  '';
 }
