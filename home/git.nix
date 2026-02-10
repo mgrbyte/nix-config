@@ -121,6 +121,10 @@ in {
       "*" = {
         sendEnv = [ "LANG" "LC_*" ];
         hashKnownHosts = true;
+        addKeysToAgent = "yes";
+        extraOptions = lib.optionalAttrs isDarwin {
+          UseKeychain = "yes";
+        };
       };
       "github.com" = {
         identitiesOnly = true;
