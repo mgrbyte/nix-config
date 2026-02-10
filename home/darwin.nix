@@ -35,8 +35,9 @@ in {
       mkdir -p "$HOME/Applications"
       for app in Alacritty Emacs; do
         if [[ -e "$HOME/.nix-profile/Applications/$app.app" ]]; then
-          # Remove existing aliases (handles all variants including numbered suffixes)
-          rm -rf "$HOME/Applications/$app.app"* 2>/dev/null || true
+          # Remove ALL existing aliases/files matching this app name
+          # Use find to handle spaces in filenames and numbered variants
+          find "$HOME/Applications" -maxdepth 1 -name "$app.app*" -exec rm -rf {} + 2>/dev/null || true
           # Create new Finder alias (Finder may add " alias" suffix)
           /usr/bin/osascript -e "tell application \"Finder\" to make alias file to POSIX file \"$HOME/.nix-profile/Applications/$app.app\" at POSIX file \"$HOME/Applications\"" >/dev/null 2>&1 || true
           # Rename if Finder added " alias" suffix
