@@ -28,19 +28,20 @@ in {
   # Config lives at ~/.config/karabiner/karabiner.json - edit manually if needed
   # Current mappings: Cmd+f/b/d/u/l/y/./,/</> -> Meta equivalents in terminals
 
-  # Create Spotlight-indexable aliases for nix apps
+  # Create Spotlight-indexable aliases for nix apps in ~/Applications
+  # Using ~/Applications avoids JAMF/IT restrictions on /Applications
   home.activation.createAppAliases = lib.mkIf isDarwin (
     lib.hm.dag.entryAfter ["writeBoundary"] ''
-      # Create Finder aliases in /Applications so Spotlight can find nix apps
+      mkdir -p "$HOME/Applications"
       for app in Alacritty Emacs; do
         if [[ -e "$HOME/.nix-profile/Applications/$app.app" ]]; then
-          # Remove existing aliases (handles both "App.app" and "App.app alias" variants)
-          rm -f "/Applications/$app.app" "/Applications/$app.app alias" 2>/dev/null || true
+          # Remove existing aliases (handles all variants including numbered suffixes)
+          rm -rf "$HOME/Applications/$app.app"* 2>/dev/null || true
           # Create new Finder alias (Finder may add " alias" suffix)
-          /usr/bin/osascript -e "tell application \"Finder\" to make alias file to POSIX file \"$HOME/.nix-profile/Applications/$app.app\" at POSIX file \"/Applications\"" >/dev/null 2>&1 || true
+          /usr/bin/osascript -e "tell application \"Finder\" to make alias file to POSIX file \"$HOME/.nix-profile/Applications/$app.app\" at POSIX file \"$HOME/Applications\"" >/dev/null 2>&1 || true
           # Rename if Finder added " alias" suffix
-          if [[ -e "/Applications/$app.app alias" ]]; then
-            mv "/Applications/$app.app alias" "/Applications/$app.app"
+          if [[ -e "$HOME/Applications/$app.app alias" ]]; then
+            mv "$HOME/Applications/$app.app alias" "$HOME/Applications/$app.app"
           fi
         fi
       done
@@ -100,9 +101,9 @@ EXEC
       DOCKUTIL="${pkgs.dockutil}/bin/dockutil"
       CHANGED=0
 
-      # Add Alacritty to dock (use actual nix-profile path, not alias)
+      # Add Alacritty to dock from ~/Applications
       if ! "$DOCKUTIL" --find Alacritty >/dev/null 2>&1; then
-        "$DOCKUTIL" --add "$HOME/.nix-profile/Applications/Alacritty.app" --no-restart >/dev/null 2>&1 || true
+        "$DOCKUTIL" --add "$HOME/Applications/Alacritty.app" --no-restart >/dev/null 2>&1 || true
         CHANGED=1
       fi
 
