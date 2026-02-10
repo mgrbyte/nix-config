@@ -93,8 +93,9 @@
       # Explicitly list keys since homeage symlinks don't work with grep
       # Use fixed socket path so emacs daemon can find it
       if command -v keychain &>/dev/null; then
+        # Clean stale socket from previous session
+        [[ -S ~/.ssh/agent.sock ]] && ! ssh-add -l &>/dev/null && rm -f ~/.ssh/agent.sock
         eval $(keychain --eval --quiet --nogui \
-          --agents ssh \
           --ssh-agent-socket ~/.ssh/agent.sock \
           ~/.ssh/id_ed25519_agenix \
           ~/.ssh/id_mtr21pqh_github \
