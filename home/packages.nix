@@ -122,6 +122,7 @@ in {
     json-mode
     keyfreq
     lsp-mode
+    lsp-pyright
     lsp-ui
     magit
     markdown-mode
