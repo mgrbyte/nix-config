@@ -33,7 +33,7 @@ in {
       EnvironmentVariables = {
         PATH = nixPath;
         CLAUDE_TIPS_FILE = "${homeDir}/.claude/tips.txt";
-        SSH_AUTH_SOCK = "${homeDir}/.ssh/agent.sock";
+        # SSH_AUTH_SOCK inherited from launchd (macOS native ssh-agent)
       };
     };
   };

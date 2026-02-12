@@ -34,12 +34,12 @@
         source = "${nix-secrets}/uv.toml.age";
         symlinks = [ "${homeDir}/.config/uv/uv.toml" ];
       };
-      "netrc-work" = {
-        source = "${nix-secrets}/netrc-work.age";
+      "work-netrc" = {
+        source = "${nix-secrets}/work.netrc.age";
         symlinks = [ "${homeDir}/.netrc" ];
       };
-      "netrc-personal" = {
-        source = "${nix-secrets}/netrc-personal.age";
+      "personal-netrc" = {
+        source = "${nix-secrets}/personal.netrc.age";
       };
       "allowed-signers" = {
         source = "${nix-secrets}/allowed-signers.age";
