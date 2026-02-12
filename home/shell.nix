@@ -89,18 +89,15 @@
       # Treat path segments as separate words
       WORDCHARS=''${WORDCHARS/\//}
 
-      # SSH key management via keychain
-      # Explicitly list keys since homeage symlinks don't work with grep
-      # Use fixed socket path so emacs daemon can find it
-      if command -v keychain &>/dev/null; then
-        # Clean stale socket from previous session
-        [[ -S ~/.ssh/agent.sock ]] && ! ssh-add -l &>/dev/null && rm -f ~/.ssh/agent.sock
-        eval $(keychain --eval --quiet --nogui \
-          --ssh-agent-socket ~/.ssh/agent.sock \
-          ~/.ssh/id_ed25519_agenix \
-          ~/.ssh/id_mtr21pqh_github \
-          ~/.ssh/id_ed25519_mtr21pqh)
-      fi
+      # SSH key management
+      # - macOS: UseKeychain + AddKeysToAgent in ~/.ssh/config handles persistence
+      # - Linux: keychain utility needed (no macOS Keychain equivalent)
+      ${lib.optionalString pkgs.stdenv.isLinux ''
+      eval $(keychain --eval --quiet --nogui \
+        ~/.ssh/id_ed25519_agenix \
+        ~/.ssh/id_mtr21pqh_github \
+        ~/.ssh/id_ed25519_mtr21pqh)
+      ''}
 
       # Load work environment (API keys)
       if [[ -e "$HOME/.work.env" ]]; then
