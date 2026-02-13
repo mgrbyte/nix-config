@@ -36,6 +36,7 @@ in {
 
     # LLMs
     claude-code
+    ollama
 
     # Emacs
     emacs
