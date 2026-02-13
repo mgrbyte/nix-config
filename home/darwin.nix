@@ -40,10 +40,13 @@ in {
           find "$HOME/Applications" -maxdepth 1 -name "$app.app*" -exec rm -rf {} + 2>/dev/null || true
           # Create new Finder alias (Finder may add " alias" suffix)
           /usr/bin/osascript -e "tell application \"Finder\" to make alias file to POSIX file \"$HOME/.nix-profile/Applications/$app.app\" at POSIX file \"$HOME/Applications\"" >/dev/null 2>&1 || true
-          # Rename if Finder added " alias" suffix
-          if [[ -e "$HOME/Applications/$app.app alias" ]]; then
-            mv "$HOME/Applications/$app.app alias" "$HOME/Applications/$app.app"
-          fi
+          # Rename if Finder added " alias" or " alias N" suffix
+          for alias_file in "$HOME/Applications/$app.app alias"*; do
+            if [[ -e "$alias_file" ]]; then
+              mv "$alias_file" "$HOME/Applications/$app.app"
+              break
+            fi
+          done
         fi
       done
     ''
