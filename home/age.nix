@@ -67,4 +67,10 @@
     ${pkgs.openssh}/bin/ssh-keygen -y -f ${homeDir}/.ssh/id_mtr21pqh_github > ${homeDir}/.ssh/id_mtr21pqh_github.pub
     ${pkgs.openssh}/bin/ssh-keygen -y -f ${homeDir}/.ssh/id_ed25519_mtr21pqh > ${homeDir}/.ssh/id_ed25519_mtr21pqh.pub
   '';
+
+  # Load SSH keys into agent (and macOS keychain) for git signing
+  home.activation.loadSshKeysToAgent = lib.hm.dag.entryAfter ["generateSshPubKeys"] ''
+    /usr/bin/ssh-add --apple-use-keychain ${homeDir}/.ssh/id_ed25519_mtr21pqh 2>/dev/null || true
+    /usr/bin/ssh-add --apple-use-keychain ${homeDir}/.ssh/id_mtr21pqh_github 2>/dev/null || true
+  '';
 }
