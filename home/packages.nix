@@ -113,8 +113,10 @@ in {
     envrc
     exec-path-from-shell
     f
+    flycheck
     flycheck-clj-kondo
     gist
+    gptel
     google-this
     helm
     helm-projectile
