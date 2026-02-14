@@ -65,7 +65,7 @@
       ZSH_AUTOSUGGEST_HISTORY_IGNORE="( *)"
 
       # Disable partial line marker (the % shown when output doesn't end with newline)
-      PROMPT_EOL_MARK=''
+      PROMPT_EOL_MARK=""
 
       # Oh-my-posh prompt
       eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/config.json)"
