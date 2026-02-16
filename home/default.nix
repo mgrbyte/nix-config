@@ -36,6 +36,7 @@ in {
     ./darwin.nix
     ./age.nix
     ./llms.nix
+    ./python-tooling.nix
   ];
 
   # Make shared variables available to all modules

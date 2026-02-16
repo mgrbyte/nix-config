@@ -61,15 +61,6 @@
     executable = true;
   };
 
-  # Mypy wrapper for flycheck (runs mypy via uv in project context)
-  home.file.".local/bin/uv-mypy" = {
-    text = ''
-      #!/bin/bash
-      exec uv run mypy "$@"
-    '';
-    executable = true;
-  };
-
   # Regenerate SSH public keys from private keys on activation
   # This ensures .pub files always match the canonical private keys
   home.activation.generateSshPubKeys = lib.hm.dag.entryAfter ["writeBoundary"] ''

@@ -9,6 +9,19 @@ let
     version = "0.7.2";
     src = emacs-abyss-theme;
   };
+
+  # Build claude-code.el from github (not in nixpkgs)
+  claude-code-el-pkg = pkgs.emacsPackages.trivialBuild {
+    pname = "claude-code";
+    version = "0.1.0";
+    src = pkgs.fetchFromGitHub {
+      owner = "stevemolitor";
+      repo = "claude-code.el";
+      rev = "main";
+      sha256 = "sha256-ISlD6q1hceckry1Jd19BX1MfobHJxng5ulX2gq9f644=";
+    };
+    packageRequires = with pkgs.emacsPackages; [ inheritenv ];
+  };
 in {
   home.packages = with pkgs; [
     # General packages for development and system management
@@ -99,8 +112,9 @@ in {
     # Platform-specific pinentry
     (if isDarwin then pinentry_mac else pinentry-curses)
   ] ++ [
-    # Emacs packages from flake inputs
+    # Emacs packages from flake inputs / github
     abyss-theme-pkg
+    claude-code-el-pkg
   ] ++ (with pkgs.emacsPackages; [
     # Emacs packages - all managed by nix (not MELPA)
     clojure-mode
@@ -113,10 +127,13 @@ in {
     envrc
     exec-path-from-shell
     f
+    eat
     flycheck
     flycheck-clj-kondo
     gist
     gptel
+    mcp
+    mcp-server-lib
     google-this
     helm
     helm-projectile
@@ -135,6 +152,7 @@ in {
     nerd-icons-ibuffer
     nix-mode
     org
+    org-mcp
     paredit
     powerline
     projectile
