@@ -108,6 +108,9 @@ in {
       "includeIf \"gitdir:${homeDir}/github/techiaith/\"" = {
         path = "${homeDir}/.config/git/work.inc";
       };
+      "includeIf \"gitdir:${homeDir}/huggingface/\"" = {
+        path = "${homeDir}/.config/git/work.inc";
+      };
     };
   };
 
