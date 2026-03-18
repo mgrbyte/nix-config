@@ -72,6 +72,12 @@ in {
       # Selection
       [selection]
       save_to_clipboard = true
+
+      # Keyboard bindings
+      [[keyboard.bindings]]
+      key = "Return"
+      mods = "Shift"
+      chars = "\n"
     '';
   };
 }
