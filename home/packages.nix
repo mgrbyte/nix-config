@@ -22,6 +22,69 @@ let
     };
     packageRequires = with pkgs.emacsPackages; [ inheritenv ];
   };
+
+  # Bundle Emacs with all packages (including custom ones)
+  myEmacs = (pkgs.emacsPackagesFor pkgs.emacs).emacsWithPackages (epkgs: [
+    abyss-theme-pkg
+    claude-code-el-pkg
+  ] ++ (with epkgs; [
+    clojure-mode
+    company
+    dash
+    dashboard
+    dirvish
+    dockerfile-mode
+    editorconfig
+    envrc
+    exec-path-from-shell
+    f
+    eat
+    flycheck
+    flycheck-clj-kondo
+    gist
+    gptel
+    mcp
+    mcp-server-lib
+    google-this
+    helm
+    helm-projectile
+    inheritenv
+    jinja2-mode
+    js2-mode
+    json-mode
+    keyfreq
+    lsp-mode
+    lsp-pyright
+    lsp-ui
+    magit
+    markdown-mode
+    nerd-icons
+    nerd-icons-completion
+    nerd-icons-dired
+    nerd-icons-ibuffer
+    nix-mode
+    org
+    org-mcp
+    paredit
+    powerline
+    projectile
+    py-snippets
+    python-pytest
+    rainbow-delimiters
+    s
+    sass-mode
+    treemacs
+    treemacs-magit
+    treemacs-nerd-icons
+    treemacs-projectile
+    vcl-mode
+    vterm
+    vterm-toggle
+    whitespace-cleanup-mode
+    wucuo
+    yaml-mode
+    zygospore
+  ]));
 in {
   home.packages = with pkgs; [
     # General packages for development and system management
@@ -51,8 +114,8 @@ in {
     claude-code
     ollama
 
-    # Emacs
-    emacs
+    # Emacs (bundled with all packages)
+    myEmacs
 
     # Cloud-related tools and SDKs
     docker
@@ -111,68 +174,7 @@ in {
 
     # Platform-specific pinentry
     (if isDarwin then pinentry_mac else pinentry-curses)
-  ] ++ [
-    # Emacs packages from flake inputs / github
-    abyss-theme-pkg
-    claude-code-el-pkg
-  ] ++ (with pkgs.emacsPackages; [
-    # Emacs packages - all managed by nix (not MELPA)
-    clojure-mode
-    company
-    dash
-    dashboard
-    dirvish
-    dockerfile-mode
-    editorconfig
-    envrc
-    exec-path-from-shell
-    f
-    eat
-    flycheck
-    flycheck-clj-kondo
-    gist
-    gptel
-    mcp
-    mcp-server-lib
-    google-this
-    helm
-    helm-projectile
-    jinja2-mode
-    js2-mode
-    json-mode
-    keyfreq
-    lsp-mode
-    lsp-pyright
-    lsp-ui
-    magit
-    markdown-mode
-    nerd-icons
-    nerd-icons-completion
-    nerd-icons-dired
-    nerd-icons-ibuffer
-    nix-mode
-    org
-    org-mcp
-    paredit
-    powerline
-    projectile
-    py-snippets
-    python-pytest
-    rainbow-delimiters
-    s
-    sass-mode
-    treemacs
-    treemacs-magit
-    treemacs-nerd-icons
-    treemacs-projectile
-    vcl-mode
-    vterm
-    vterm-toggle
-    whitespace-cleanup-mode
-    wucuo
-    yaml-mode
-    zygospore
-  ]) ++ lib.optionals isDarwin ([
+  ] ++ lib.optionals isDarwin ([
     pkgs.dockutil  # Dock management tool
   ] ++ (with inputs.nix-casks.packages.${pkgs.stdenv.hostPlatform.system}; [
     # macOS GUI applications via nix-casks

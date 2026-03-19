@@ -25,7 +25,7 @@ in {
   launchd.agents.emacs = lib.mkIf isDarwin {
     enable = true;
     config = {
-      ProgramArguments = [ "${pkgs.emacs}/bin/emacs" "--fg-daemon" ];
+      ProgramArguments = [ "${config.home.profileDirectory}/bin/emacs" "--fg-daemon" ];
       RunAtLoad = true;
       KeepAlive = true;
       StandardOutPath = "/tmp/emacs-daemon.log";

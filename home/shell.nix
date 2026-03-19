@@ -162,7 +162,7 @@
       # Home Manager (flake-based)
       home-manager = "nix run home-manager -- --flake '${homeDir}/github/mgrbyte/nix-config'";
       hm-switch = "nix run home-manager -- switch --flake '${homeDir}/github/mgrbyte/nix-config#mtr21pqh'";
-      hm-emacs-update = "cd ${homeDir}/github/mgrbyte/nix-config && nix run home-manager -- switch --flake '.#mtr21pqh' --override-input emacs-config path:${homeDir}/github/mgrbyte/emacs.d && launchctl kickstart -k gui/$(id -u)/org.nix-community.home.emacs";
+      hm-emacs-update = "cd ${homeDir}/github/mgrbyte/nix-config && nix flake update && nix run home-manager -- switch --flake '.#mtr21pqh' --override-input emacs-config path:${homeDir}/github/mgrbyte/emacs.d && launchctl kickstart -k gui/$(id -u)/org.nix-community.home.emacs";
 
       # Ripgrep
       search = "rg -p --glob '!node_modules/*'";
