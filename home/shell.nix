@@ -195,6 +195,10 @@
 
       # difftastic
       diff = "difft";
+
+      # Claude Code with Emacs IDE integration
+      # Starts MCP server in Emacs daemon, then launches claude with IDE env vars
+      claude-ide = "CLAUDE_CODE_SSE_PORT=$(emacsclient -e '(claude-code-ide-mcp-start (expand-file-name default-directory))' 2>/dev/null | tr -d '\"') ENABLE_IDE_INTEGRATION=true claude";
     };
 
     # Antidote plugin manager
