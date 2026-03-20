@@ -16,8 +16,8 @@ envrc_stanza() {
 # claude-code-ide integration
 # Connects Claude Code CLI to Emacs via MCP server for IDE features.
 # See: https://github.com/manzaltu/claude-code-ide.el
-if command -v emacsclient >/dev/null 2>&1; then
-  _port=$(emacsclient -e \
+if [ -z "$INSIDE_EMACS" ] && command -v emacsclient >/dev/null 2>&1; then
+  _port=$(timeout 2 emacsclient -e \
     "(claude-code-ide-mcp-start (expand-file-name \"$(pwd)\"))" \
     2>/dev/null | tr -d '"')
   if [ -n "$_port" ] && [ "$_port" != "nil" ]; then
