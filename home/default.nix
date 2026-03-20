@@ -58,6 +58,10 @@ in {
     source = ../scripts/sync-uv-tools;
     executable = true;
   };
+  home.file.".local/bin/claude-ide-envrc" = {
+    source = ../scripts/claude-ide-envrc;
+    executable = true;
+  };
 
   nix = {
     package = pkgs.nix;

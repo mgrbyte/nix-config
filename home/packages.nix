@@ -23,10 +23,38 @@ let
     packageRequires = with pkgs.emacsPackages; [ inheritenv ];
   };
 
+  # Build claude-code-ide.el from github (not in nixpkgs)
+  claude-code-ide-pkg = pkgs.emacsPackages.trivialBuild {
+    pname = "claude-code-ide";
+    version = "0.1.0";
+    src = pkgs.fetchFromGitHub {
+      owner = "manzaltu";
+      repo = "claude-code-ide.el";
+      rev = "main";
+      sha256 = "sha256-tivRvgfI/8XBRImE3wuZ1UD0t2dNWYscv3Aa53BmHZE=";
+    };
+    packageRequires = with pkgs.emacsPackages; [ websocket web-server transient ];
+  };
+
+  # vterm-anti-flicker-filter - reduces terminal flickering in vterm
+  vterm-anti-flicker-filter-pkg = pkgs.emacsPackages.trivialBuild {
+    pname = "vterm-anti-flicker-filter";
+    version = "0.1.0";
+    src = pkgs.fetchFromGitHub {
+      owner = "martinbaillie";
+      repo = "vterm-anti-flicker-filter";
+      rev = "main";
+      sha256 = "sha256-sFPBDyvSu8yvUmfrmg82rjUzQRUvyY4pBIlhL4OYACY=";
+    };
+    packageRequires = with pkgs.emacsPackages; [ vterm ];
+  };
+
   # Bundle Emacs with all packages (including custom ones)
   myEmacs = (pkgs.emacsPackagesFor pkgs.emacs).emacsWithPackages (epkgs: [
     abyss-theme-pkg
     claude-code-el-pkg
+    claude-code-ide-pkg
+    vterm-anti-flicker-filter-pkg
   ] ++ (with epkgs; [
     clojure-mode
     company
@@ -80,6 +108,8 @@ let
     vcl-mode
     vterm
     vterm-toggle
+    web-server
+    websocket
     whitespace-cleanup-mode
     wucuo
     yaml-mode

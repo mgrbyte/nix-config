@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Add Claude Code IDE integration to .envrc in the current directory.
+# Starts an MCP server in Emacs and exports the port so Claude Code
+# in Alacritty gets editor context (LSP diagnostics, xref, etc.).
+#
+# Usage: claude-ide-envrc
+#
+# Requires: emacsclient (Emacs daemon running), direnv
+
+set -euo pipefail
+
+MARKER="# claude-code-ide integration"
+
+envrc_stanza() {
+  cat <<'ENVRC'
+# claude-code-ide integration
+# Connects Claude Code CLI to Emacs via MCP server for IDE features.
+# See: https://github.com/manzaltu/claude-code-ide.el
+if command -v emacsclient >/dev/null 2>&1; then
+  _port=$(emacsclient -e \
+    "(claude-code-ide-mcp-start (expand-file-name \"$(pwd)\"))" \
+    2>/dev/null | tr -d '"')
+  if [ -n "$_port" ] && [ "$_port" != "nil" ]; then
+    export CLAUDE_CODE_SSE_PORT=$_port
+    export ENABLE_IDE_INTEGRATION=true
+  fi
+  unset _port
+fi
+ENVRC
+}
+
+if [ -f .envrc ] && grep -qF "$MARKER" .envrc; then
+  echo ".envrc already has claude-code-ide integration"
+  exit 0
+fi
+
+if [ -f .envrc ]; then
+  printf '\n' >> .envrc
+  envrc_stanza >> .envrc
+  echo "Appended claude-code-ide integration to .envrc"
+else
+  envrc_stanza > .envrc
+  echo "Created .envrc with claude-code-ide integration"
+fi
+
+direnv allow .
