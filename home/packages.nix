@@ -2,6 +2,7 @@
 
 let
   isDarwin = pkgs.stdenv.isDarwin;
+  isLinux = pkgs.stdenv.isLinux;
 
   # Build abyss-theme from flake input
   abyss-theme-pkg = pkgs.emacsPackages.trivialBuild {
@@ -150,7 +151,6 @@ in {
     docker
     docker-compose
 
-
     # Media-related packages
     dejavu_fonts
     ffmpeg
@@ -165,6 +165,7 @@ in {
     # Spell checking
     hunspell
     hunspellDicts.en-gb-ise
+    hunspellDicts.cy_GB
 
     # development tools / text utils
     awscli2
@@ -174,6 +175,7 @@ in {
     difftastic
     fzf
     gh
+    gimp-with-plugins
     glab
     jq
     kubectl
@@ -203,6 +205,9 @@ in {
 
     # Platform-specific pinentry
     (if isDarwin then pinentry_mac else pinentry-curses)
+  ] ++ lib.optionals isLinux [
+    firefox
+    wl-clipboard
   ] ++ lib.optionals isDarwin ([
     pkgs.dockutil  # Dock management tool
   ] ++ (with inputs.nix-casks.packages.${pkgs.stdenv.hostPlatform.system}; [

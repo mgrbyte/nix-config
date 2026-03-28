@@ -1,8 +1,7 @@
-{ config, pkgs, lib, inputs, emacs-config, emacs-abyss-theme, nix-colors, nix-secrets, hunspell-cy, ... }:
+{ config, pkgs, lib, inputs, emacs-config, emacs-abyss-theme, nix-colors, nix-secrets, user, ... }:
 
 let
   name = "Matt Russell";
-  user = "mtr21pqh";
   email = "m.russell@bangor.ac.uk";
   isDarwin = pkgs.stdenv.isDarwin;
   isLinux = pkgs.stdenv.isLinux;
@@ -18,6 +17,8 @@ let
   systemPaths = [
     "${homeDir}/.nix-profile/bin"
     "/nix/var/nix/profiles/default/bin"
+    "/run/wrappers/bin"
+    "/run/current-system/sw/bin"
     "/usr/local/bin"
     "/usr/bin"
     "/bin"
@@ -41,7 +42,7 @@ in {
 
   # Make shared variables available to all modules
   _module.args = {
-    inherit name user email homeDir nixPath emacs-config emacs-abyss-theme nix-secrets hunspell-cy;
+    inherit name user email homeDir nixPath emacs-config emacs-abyss-theme nix-secrets;
   };
 
   home.username = user;
@@ -52,6 +53,16 @@ in {
 
   programs.home-manager.enable = true;
   nixpkgs.config.allowUnfree = true;
+
+  # Ensure XDG_DATA_DIRS includes HM profile paths for GNOME app discovery
+  targets.genericLinux.enable = isLinux;
+
+  # Remap Caps Lock to Ctrl in GNOME (Linux only; macOS handled via Karabiner)
+  dconf.settings = lib.mkIf isLinux {
+    "org/gnome/desktop/input-sources" = {
+      xkb-options = [ "ctrl:nocaps" ];
+    };
+  };
 
   # Custom scripts
   home.file.".local/bin/sync-uv-tools" = {

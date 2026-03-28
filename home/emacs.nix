@@ -37,4 +37,35 @@ in {
       };
     };
   };
+
+  # Emacsclient desktop entry (Linux only; macOS uses darwin.nix createEmacsclientApp)
+  xdg.desktopEntries.emacsclient = lib.mkIf (pkgs.stdenv.isLinux) {
+    name = "Emacsclient";
+    genericName = "Text Editor";
+    comment = "Connect to Emacs daemon";
+    exec = "${config.home.profileDirectory}/bin/emacsclient -c %F";
+    icon = "emacs";
+    type = "Application";
+    categories = [ "Development" "TextEditor" "Utility" ];
+  };
+
+  # Emacs daemon via systemd (Linux only)
+  systemd.user.services.emacs = lib.mkIf pkgs.stdenv.isLinux {
+    Unit = {
+      Description = "Emacs daemon";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "notify";
+      ExecStart = "${config.home.profileDirectory}/bin/emacs --fg-daemon";
+      ExecStop = "${config.home.profileDirectory}/bin/emacsclient --eval \"(kill-emacs)\"";
+      Restart = "on-failure";
+      Environment = [
+        "PATH=${nixPath}"
+        "CLAUDE_TIPS_FILE=${homeDir}/.claude/tips.txt"
+      ];
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
 }

@@ -30,8 +30,13 @@
       }
     ];
     terminal = "screen-256color";
-    prefix = "C-x";
+    prefix = "C-]";
+    mouse = true;
     escapeTime = 10;
     historyLimit = 50000;
+    extraConfig = ''
+      # Scroll up enters copy mode automatically; prevents escape sequences leaking to shell
+      bind -n WheelUpPane if-shell -F -t = "#{mouse_any_flag}" "send-keys -M" "if -Ft= '#{pane_in_mode}' 'send-keys -M' 'copy-mode -e'"
+    '';
   };
 }

@@ -36,24 +36,18 @@
       flake = false;
     };
 
-    hunspell-cy = {
-      url = "github:techiaith/hunspell-cy";
-      flake = false;
-    };
   };
 
   outputs = { nixpkgs, home-manager, emacs-config, nix-casks, nix-colors, ... }@inputs:
     let
-      user = "mtr21pqh";
       systems = [ "aarch64-darwin" "x86_64-darwin" "x86_64-linux" "aarch64-linux" ];
       forAllSystems = f: nixpkgs.lib.genAttrs systems f;
 
-      mkHomeConfig = system: home-manager.lib.homeManagerConfiguration {
+      mkHomeConfig = { system, user }: home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.${system};
         extraSpecialArgs = {
-          inherit inputs emacs-config nix-colors;
+          inherit inputs emacs-config nix-colors user;
           nix-secrets = inputs.nix-secrets;
-          hunspell-cy = inputs.hunspell-cy;
           emacs-abyss-theme = inputs.emacs-abyss-theme;
         };
         modules = [
@@ -64,16 +58,19 @@
       };
     in
     {
-      # homeConfigurations."username" for each system
+      # homeConfigurations for mtr21pqh (work macOS)
       # Use: home-manager switch --flake .#mtr21pqh
-      homeConfigurations.${user} = mkHomeConfig "aarch64-darwin";
+      homeConfigurations."mtr21pqh" = mkHomeConfig { system = "aarch64-darwin"; user = "mtr21pqh"; };
+      homeConfigurations."mtr21pqh-aarch64-darwin" = mkHomeConfig { system = "aarch64-darwin"; user = "mtr21pqh"; };
+      homeConfigurations."mtr21pqh-x86_64-darwin" = mkHomeConfig { system = "x86_64-darwin"; user = "mtr21pqh"; };
+      homeConfigurations."mtr21pqh-x86_64-linux" = mkHomeConfig { system = "x86_64-linux"; user = "mtr21pqh"; };
+      homeConfigurations."mtr21pqh-aarch64-linux" = mkHomeConfig { system = "aarch64-linux"; user = "mtr21pqh"; };
 
-      # Also provide system-specific configs if needed
-      # Use: home-manager switch --flake .#mtr21pqh-aarch64-darwin
-      homeConfigurations."${user}-aarch64-darwin" = mkHomeConfig "aarch64-darwin";
-      homeConfigurations."${user}-x86_64-darwin" = mkHomeConfig "x86_64-darwin";
-      homeConfigurations."${user}-x86_64-linux" = mkHomeConfig "x86_64-linux";
-      homeConfigurations."${user}-aarch64-linux" = mkHomeConfig "aarch64-linux";
+      # homeConfigurations for mgrbyte (personal NixOS)
+      # Use: home-manager switch --flake .#mgrbyte
+      homeConfigurations."mgrbyte" = mkHomeConfig { system = "x86_64-linux"; user = "mgrbyte"; };
+      homeConfigurations."mgrbyte-x86_64-linux" = mkHomeConfig { system = "x86_64-linux"; user = "mgrbyte"; };
+      homeConfigurations."mgrbyte-aarch64-linux" = mkHomeConfig { system = "aarch64-linux"; user = "mgrbyte"; };
 
       # Dev shell for working on this config
       devShells = forAllSystems (system:

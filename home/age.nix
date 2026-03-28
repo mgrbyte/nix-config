@@ -1,4 +1,4 @@
-{ config, pkgs, lib, homeDir, nix-secrets, hunspell-cy, ... }:
+{ config, pkgs, lib, homeDir, nix-secrets, ... }:
 
 {
   secrets = {
@@ -51,10 +51,6 @@
   # Clojure deps.edn - development aliases and tools
   home.file.".clojure/deps.edn".source = ../config/deps.edn;
 
-  # Welsh hunspell dictionary (from techiaith/hunspell-cy)
-  home.file.".local/share/hunspell/cy_GB.dic".source = "${hunspell-cy}/cy_GB.dic";
-  home.file.".local/share/hunspell/cy_GB.aff".source = "${hunspell-cy}/cy_GB.aff";
-
   # Secret rotation helper
   home.file.".local/bin/update-secret" = {
     source = ../scripts/update-secret;
@@ -63,14 +59,22 @@
 
   # Regenerate SSH public keys from private keys on activation
   # This ensures .pub files always match the canonical private keys
+  # Keys may not exist on first run (created by home-manager-secrets service)
   home.activation.generateSshPubKeys = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    ${pkgs.openssh}/bin/ssh-keygen -y -f ${homeDir}/.ssh/id_mtr21pqh_github > ${homeDir}/.ssh/id_mtr21pqh_github.pub
-    ${pkgs.openssh}/bin/ssh-keygen -y -f ${homeDir}/.ssh/id_ed25519_mtr21pqh > ${homeDir}/.ssh/id_ed25519_mtr21pqh.pub
+    if [[ -f ${homeDir}/.ssh/id_mtr21pqh_github ]]; then
+      ${pkgs.openssh}/bin/ssh-keygen -y -f ${homeDir}/.ssh/id_mtr21pqh_github > ${homeDir}/.ssh/id_mtr21pqh_github.pub
+    fi
+    if [[ -f ${homeDir}/.ssh/id_ed25519_mtr21pqh ]]; then
+      ${pkgs.openssh}/bin/ssh-keygen -y -f ${homeDir}/.ssh/id_ed25519_mtr21pqh > ${homeDir}/.ssh/id_ed25519_mtr21pqh.pub
+    fi
   '';
 
   # Load SSH keys into agent (and macOS keychain) for git signing
-  home.activation.loadSshKeysToAgent = lib.hm.dag.entryAfter ["generateSshPubKeys"] ''
-    /usr/bin/ssh-add --apple-use-keychain ${homeDir}/.ssh/id_ed25519_mtr21pqh 2>/dev/null || true
-    /usr/bin/ssh-add --apple-use-keychain ${homeDir}/.ssh/id_mtr21pqh_github 2>/dev/null || true
-  '';
+  # Linux uses keychain in shell.nix instead
+  home.activation.loadSshKeysToAgent = lib.mkIf pkgs.stdenv.isDarwin (
+    lib.hm.dag.entryAfter ["generateSshPubKeys"] ''
+      /usr/bin/ssh-add --apple-use-keychain ${homeDir}/.ssh/id_ed25519_mtr21pqh 2>/dev/null || true
+      /usr/bin/ssh-add --apple-use-keychain ${homeDir}/.ssh/id_mtr21pqh_github 2>/dev/null || true
+    ''
+  );
 }

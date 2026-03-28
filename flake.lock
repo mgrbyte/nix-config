@@ -105,22 +105,6 @@
         "type": "github"
       }
     },
-    "hunspell-cy": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1743423629,
-        "narHash": "sha256-T1p0LbCUTKN7xfogbI2RqxdONgcMxDpjjFW+dN8IGa4=",
-        "owner": "techiaith",
-        "repo": "hunspell-cy",
-        "rev": "c2fc0d27706637877b6ef9e8b7ff169383f09b1e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "techiaith",
-        "repo": "hunspell-cy",
-        "type": "github"
-      }
-    },
     "lefthook": {
       "inputs": {
         "nixpkgs": [
@@ -281,7 +265,6 @@
         "emacs-config": "emacs-config",
         "home-manager": "home-manager",
         "home-manager-secrets": "home-manager-secrets",
-        "hunspell-cy": "hunspell-cy",
         "nix-casks": "nix-casks",
         "nix-colors": "nix-colors",
         "nix-secrets": "nix-secrets",

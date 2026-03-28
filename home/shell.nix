@@ -1,4 +1,4 @@
-{ config, pkgs, lib, homeDir, nixPath, ... }:
+{ config, pkgs, lib, homeDir, nixPath, user, ... }:
 
 {
   programs.zsh = {
@@ -51,7 +51,7 @@
       export UV_CONFIG="$HOME/.config/uv/uv.toml"
 
       # Hunspell dictionaries (Welsh + English)
-      export DICPATH="$HOME/.local/share/hunspell:${pkgs.hunspellDicts.en-gb-ise}/share/hunspell"
+      export DICPATH="$HOME/.local/share/hunspell:${pkgs.hunspellDicts.en-gb-ise}/share/hunspell:${pkgs.hunspellDicts.cy_GB}/share/hunspell"
 
       # HuggingFace token
       if [[ -r "$HOME/.secrets/huggingface-token" ]]; then
@@ -61,6 +61,10 @@
 
     # Interactive shell config (.zshrc)
     initContent = ''
+      # Auto-start tmux (consistent tab behaviour across macOS and Linux)
+      if [[ -z "$TMUX" && -z "$EMACS" && -z "$VIM" ]]; then
+        tmux attach-session -t default 2>/dev/null || tmux new-session -s default
+      fi
       # Don't suggest commands that start with space (security: space-prefixed commands are private)
       ZSH_AUTOSUGGEST_HISTORY_IGNORE="( *)"
 
@@ -161,8 +165,10 @@
     shellAliases = {
       # Home Manager (flake-based)
       home-manager = "nix run home-manager -- --flake '${homeDir}/github/mgrbyte/nix-config'";
-      hm-switch = "nix run home-manager -- switch --flake '${homeDir}/github/mgrbyte/nix-config#mtr21pqh'";
-      hm-emacs-update = "cd ${homeDir}/github/mgrbyte/nix-config && nix flake update && nix run home-manager -- switch --flake '.#mtr21pqh' --override-input emacs-config path:${homeDir}/github/mgrbyte/emacs.d && launchctl kickstart -k gui/$(id -u)/org.nix-community.home.emacs";
+      hm-switch = "nix run home-manager -- switch --flake '${homeDir}/github/mgrbyte/nix-config#${user}'";
+      hm-emacs-update = if pkgs.stdenv.isDarwin
+        then "cd ${homeDir}/github/mgrbyte/nix-config && nix flake update && nix run home-manager -- switch --flake '.#${user}' --override-input emacs-config path:${homeDir}/github/mgrbyte/emacs.d && launchctl kickstart -k gui/$(id -u)/org.nix-community.home.emacs"
+        else "cd ${homeDir}/github/mgrbyte/nix-config && nix flake update && nix run home-manager -- switch --flake '.#${user}' --override-input emacs-config path:${homeDir}/github/mgrbyte/emacs.d && systemctl --user restart emacs";
 
       # Ripgrep
       search = "rg -p --glob '!node_modules/*'";
@@ -176,6 +182,10 @@
       rg-py = "search --type=python";
       rg-toml = "search --type=toml";
       rg-ts = "search --type=typescript";
+
+      # Clipboard aliases (macOS compatibility)
+      pbcopy = lib.mkIf pkgs.stdenv.isLinux "wl-copy";
+      pbpaste = lib.mkIf pkgs.stdenv.isLinux "wl-paste";
 
       keychain = "keychain --nocolor";
       ls = "ls --color=auto";
