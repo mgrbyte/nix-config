@@ -33,21 +33,23 @@ in {
   home.activation.createAppAliases = lib.mkIf isDarwin (
     lib.hm.dag.entryAfter ["writeBoundary"] ''
       mkdir -p "$HOME/Applications"
-      for app in Alacritty Emacs; do
-        if [[ -e "$HOME/.nix-profile/Applications/$app.app" ]]; then
-          # Remove ALL existing aliases/files matching this app name
-          # Use find to handle spaces in filenames and numbered variants
-          find "$HOME/Applications" -maxdepth 1 -name "$app.app*" -exec rm -rf {} + 2>/dev/null || true
-          # Create new Finder alias (Finder may add " alias" suffix)
-          /usr/bin/osascript -e "tell application \"Finder\" to make alias file to POSIX file \"$HOME/.nix-profile/Applications/$app.app\" at POSIX file \"$HOME/Applications\"" >/dev/null 2>&1 || true
-          # Rename if Finder added " alias" or " alias N" suffix
-          for alias_file in "$HOME/Applications/$app.app alias"*; do
-            if [[ -e "$alias_file" ]]; then
-              mv "$alias_file" "$HOME/Applications/$app.app"
-              break
-            fi
-          done
-        fi
+      for app_path in "$HOME/.nix-profile/Applications/"*.app; do
+        [[ -e "$app_path" ]] || continue
+        app=$(basename "$app_path")
+        # Remove ALL existing aliases/files matching this app name
+        find "$HOME/Applications" -maxdepth 1 -name "$app*" -exec rm -rf {} + 2>/dev/null || true
+        # Resolve symlink - Finder requires the real nix store path, not the .nix-profile path
+        real_path=$(readlink "$app_path")
+        [[ -n "$real_path" ]] || real_path="$app_path"
+        # Create new Finder alias (Finder may add " alias" suffix)
+        /usr/bin/osascript -e "tell application \"Finder\" to make alias file to POSIX file \"$real_path\" at POSIX file \"$HOME/Applications\"" >/dev/null 2>&1 || true
+        # Rename if Finder added " alias" or " alias N" suffix
+        for alias_file in "$HOME/Applications/$app alias"*; do
+          if [[ -e "$alias_file" ]]; then
+            mv "$alias_file" "$HOME/Applications/$app"
+            break
+          fi
+        done
       done
     ''
   );
