@@ -78,6 +78,12 @@ in {
       key = "Return"
       mods = "Shift"
       chars = "\n"
+
+      # Override macOS Cmd+w (close window) to send M-w (emacs kill-ring-save)
+      [[keyboard.bindings]]
+      key = "W"
+      mods = "Command"
+      chars = "\u001bw"
     '';
   };
 }

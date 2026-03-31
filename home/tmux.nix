@@ -30,13 +30,20 @@
       }
     ];
     terminal = "screen-256color";
-    prefix = "C-]";
+    prefix = "C-t";
+    keyMode = "emacs";
     mouse = true;
     escapeTime = 10;
     historyLimit = 50000;
     extraConfig = ''
       # Scroll up enters copy mode automatically; prevents escape sequences leaking to shell
       bind -n WheelUpPane if-shell -F -t = "#{mouse_any_flag}" "send-keys -M" "if -Ft= '#{pane_in_mode}' 'send-keys -M' 'copy-mode -e'"
+
+      # Emacs-style paste with prefix + C-y
+      bind C-y paste-buffer
+
+      # M-w in copy mode copies to system clipboard (like tmux-yank's y)
+      bind -T copy-mode M-w send-keys -X copy-pipe-and-cancel "pbcopy"
     '';
   };
 }
