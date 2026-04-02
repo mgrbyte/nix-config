@@ -1,6 +1,15 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(gh search:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:news.ycombinator.com)",
+      "WebFetch(domain:emacsconf.org)",
+      "WebFetch(domain:willschenk.com)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "serena"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }

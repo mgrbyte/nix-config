@@ -201,11 +201,15 @@ in {
 
     # Programming languages and runtimes
     go
+
+    # Rust
     rustc
     cargo
+
+    # Java
     openjdk
 
-    # Python packages
+    # Python
     python3
     uv
     virtualenv
