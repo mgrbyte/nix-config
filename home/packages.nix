@@ -192,6 +192,7 @@ in {
     nodejs_24
     oh-my-posh
     ripgrep
+    socat
     terraform
     texliveFull
     tmux
