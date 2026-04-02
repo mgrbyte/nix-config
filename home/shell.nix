@@ -169,8 +169,8 @@
       home-manager = "nix run home-manager -- --flake '${homeDir}/github/mgrbyte/nix-config'";
       hm-switch = "nix run home-manager -- switch --flake '${homeDir}/github/mgrbyte/nix-config#${user}'";
       hm-emacs-update = if pkgs.stdenv.isDarwin
-        then "cd ${homeDir}/github/mgrbyte/nix-config && nix flake update && nix run home-manager -- switch --flake '.#${user}' --override-input emacs-config path:${homeDir}/github/mgrbyte/emacs.d && launchctl kickstart -k gui/$(id -u)/org.nix-community.home.emacs"
-        else "cd ${homeDir}/github/mgrbyte/nix-config && nix flake update && nix run home-manager -- switch --flake '.#${user}' --override-input emacs-config path:${homeDir}/github/mgrbyte/emacs.d && systemctl --user restart emacs";
+        then "cd ${homeDir}/github/mgrbyte/nix-config && nix flake update emacs-config && nix run home-manager -- switch --flake '.#${user}' && launchctl kickstart -k gui/$(id -u)/org.nix-community.home.emacs"
+        else "cd ${homeDir}/github/mgrbyte/nix-config && nix flake update emacs-config && nix run home-manager -- switch --flake '.#${user}' && systemctl --user restart emacs";
 
       # Ripgrep
       search = "rg -p --glob '!node_modules/*'";
@@ -200,7 +200,7 @@
 
       # Claude Code with Emacs IDE integration
       # Starts MCP server in Emacs daemon, then launches claude with IDE env vars
-      claude-ide = "CLAUDE_CODE_SSE_PORT=$(emacsclient -e '(progn (require (quote claude-code-ide-mcp-server)) (claude-code-ide-mcp-server-ensure-server) (claude-code-ide-mcp-server-get-port))' 2>/dev/null | tr -d '\"') ENABLE_IDE_INTEGRATION=true claude";
+      claude-ide = "CLAUDE_CODE_SSE_PORT=$(emacsclient -e '(claude-code-ide-mcp-start (expand-file-name default-directory))' 2>/dev/null | tr -d '\"') ENABLE_IDE_INTEGRATION=true claude";
     };
 
     # Antidote plugin manager
