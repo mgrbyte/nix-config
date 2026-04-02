@@ -40,7 +40,7 @@ let
       owner = "manzaltu";
       repo = "claude-code-ide.el";
       rev = "main";
-      sha256 = "sha256-tivRvgfI/8XBRImE3wuZ1UD0t2dNWYscv3Aa53BmHZE=";
+      sha256 = "sha256-qH1QnG5G+0UiH/v0KaS7oSpQZY+BkUMZvrjbx6kyFhg=";
     };
     packageRequires = with pkgs.emacsPackages; [ websocket web-server transient ];
   };
