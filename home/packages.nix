@@ -45,6 +45,19 @@ let
     packageRequires = with pkgs.emacsPackages; [ websocket web-server transient ];
   };
 
+  # emacs-mcp-server - MCP server exposing Emacs to Claude Code
+  emacs-mcp-server-pkg = pkgs.emacsPackages.trivialBuild {
+    pname = "emacs-mcp-server";
+    version = "0.1.0";
+    src = pkgs.fetchFromGitHub {
+      owner = "rhblind";
+      repo = "emacs-mcp-server";
+      rev = "main";
+      sha256 = "sha256-3a9pXwa8o03Y4kFcHB+CqML7SwIb3+b1qOyOaB1QUL8=";
+    };
+    packageRequires = with pkgs.emacsPackages; [ mcp-server-lib ];
+  };
+
   # vterm-anti-flicker-filter - reduces terminal flickering in vterm
   vterm-anti-flicker-filter-pkg = pkgs.emacsPackages.trivialBuild {
     pname = "vterm-anti-flicker-filter";
@@ -63,6 +76,7 @@ let
     abyss-theme-pkg
     claude-code-el-pkg
     claude-code-ide-pkg
+    emacs-mcp-server-pkg
     vterm-anti-flicker-filter-pkg
   ] ++ (with epkgs; [
     clojure-mode
