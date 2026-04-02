@@ -3,6 +3,7 @@
 {
   programs.zsh = {
     enable = true;
+    dotDir = "${config.xdg.configHome}/zsh";
     autocd = true;
     enableCompletion = true;
     cdpath = [ "~/github" "~/gitlab" ];
@@ -57,6 +58,7 @@
       if [[ -r "$HOME/.secrets/huggingface-token" ]]; then
         export HF_TOKEN="$(cat $HOME/.secrets/huggingface-token)"
       fi
+
     '';
 
     # Interactive shell config (.zshrc)
@@ -198,7 +200,7 @@
 
       # Claude Code with Emacs IDE integration
       # Starts MCP server in Emacs daemon, then launches claude with IDE env vars
-      claude-ide = "CLAUDE_GRAVITY_SOCK=$HOME/.local/state/gravity-terminal.sock CLAUDE_CODE_SSE_PORT=$(emacsclient -e '(claude-code-ide-mcp-start (expand-file-name default-directory))' 2>/dev/null | tr -d '\"') ENABLE_IDE_INTEGRATION=true claude --plugin-dir $HOME/github/gdanov/emacs-gravity/packages/emacs-bridge";
+      claude-ide = "CLAUDE_CODE_SSE_PORT=$(emacsclient -e '(claude-code-ide-mcp-start (expand-file-name default-directory))' 2>/dev/null | tr -d '\"') ENABLE_IDE_INTEGRATION=true claude";
     };
 
     # Antidote plugin manager
