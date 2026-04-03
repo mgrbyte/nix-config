@@ -70,6 +70,11 @@ in {
     executable = true;
   };
 
+  home.file.".local/bin/claude-ide-external" = {
+    source = ../scripts/claude-ide-external;
+    executable = true;
+  };
+
   nix = {
     package = pkgs.nix;
     settings = {
