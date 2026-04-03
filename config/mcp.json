@@ -3,6 +3,10 @@
     "serena": {
       "command": "uvx",
       "args": ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server"]
+    },
+    "emacs": {
+      "command": "socat",
+      "args": ["-", "UNIX-CONNECT:/Users/mtr21pqh/.emacs.d/emacs-mcp-server.sock"]
     }
   }
 }
