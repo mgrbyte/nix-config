@@ -1,0 +1,67 @@
+#!/usr/bin/env zsh
+# Launch Claude Code with Emacs IDE integration via MCP.
+# Called by mgrbyte-claude-ide-external in init-ai.el.
+#
+# Usage: claude-ide-external --port PORT --session-id ID --mcp-url URL
+#                            [--working-dir DIR] [--resume] [--continue]
+#                            [--allowed-tools TOOLS] [--extra-flags FLAGS]
+
+set -euo pipefail
+
+# Parse arguments
+port=""
+session_id=""
+mcp_url=""
+working_dir="."
+resume=""
+continue_flag=""
+allowed_tools=""
+extra_flags=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --port) port="$2"; shift 2 ;;
+        --session-id) session_id="$2"; shift 2 ;;
+        --mcp-url) mcp_url="$2"; shift 2 ;;
+        --working-dir) working_dir="$2"; shift 2 ;;
+        --resume) resume="-r"; shift ;;
+        --continue) continue_flag="-c"; shift ;;
+        --allowed-tools) allowed_tools="$2"; shift 2 ;;
+        --extra-flags) extra_flags="$2"; shift 2 ;;
+        *) echo "Unknown argument: $1" >&2; exit 1 ;;
+    esac
+done
+
+if [[ -z "$port" || -z "$session_id" || -z "$mcp_url" ]]; then
+    echo "Required: --port, --session-id, --mcp-url" >&2
+    exit 1
+fi
+
+cd "$working_dir"
+
+# Derive project name from directory for Serena activation
+project_name=$(basename "$working_dir")
+
+# Build the MCP config JSON
+mcp_config="{\"mcpServers\":{\"emacs-tools\":{\"type\":\"http\",\"url\":\"${mcp_url}\"}}}"
+
+# System prompt for Emacs context and Serena auto-activation
+system_prompt="IMPORTANT: Connected to Emacs via claude-code-ide.el integration. Emacs uses mixed coordinates: Lines: 1-based (line 1 = first line), Columns: 0-based (column 0 = first column). Example: First character in file is at line 1, column 0. Available: xref (LSP), tree-sitter, imenu, project.el, flycheck/flymake diagnostics. Context-aware with automatic project/file/selection tracking.
+
+IMPORTANT: At the start of each session, activate the Serena project for the working directory by calling mcp__serena__activate_project with the project path '${working_dir}'. If the project does not exist, Serena will create it. Read any relevant memories after activation."
+
+# Build command arguments
+cmd_args=()
+[[ -n "$resume" ]] && cmd_args+=("$resume")
+[[ -n "$continue_flag" ]] && cmd_args+=("$continue_flag")
+cmd_args+=(--append-system-prompt "$system_prompt")
+cmd_args+=(--mcp-config "$mcp_config")
+[[ -n "$allowed_tools" ]] && cmd_args+=(--allowedTools $=allowed_tools)
+[[ -n "$extra_flags" ]] && cmd_args+=($=extra_flags)
+
+# Launch Claude with env vars
+export CLAUDE_CODE_SSE_PORT="$port"
+export TERM_PROGRAM=emacs
+export FORCE_CODE_TERMINAL=true
+
+exec claude "${cmd_args[@]}"
