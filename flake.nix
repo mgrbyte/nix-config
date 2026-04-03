@@ -10,8 +10,7 @@
     };
 
     emacs-config = {
-      # TODO: temporary, revert to main once when merging
-      url = "github:mgrbyte/emacs.d/feature/claude-code-ide-integration";
+      url = "github:mgrbyte/emacs.d";
       flake = false;
     };
 
