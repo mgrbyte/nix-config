@@ -84,6 +84,18 @@ in {
       key = "W"
       mods = "Command"
       chars = "\u001bw"
+
+      # Override macOS Cmd+v (paste) to send M-v (emacs scroll-down / tmux page-up)
+      [[keyboard.bindings]]
+      key = "V"
+      mods = "Command"
+      chars = "\u001bv"
+
+      # Cmd+Shift+v sends M-V (tmux page-down)
+      [[keyboard.bindings]]
+      key = "V"
+      mods = "Command|Shift"
+      chars = "\u001bV"
     '';
   };
 }
