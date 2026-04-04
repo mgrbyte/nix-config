@@ -44,6 +44,17 @@
 
       # M-w in copy mode copies to system clipboard (like tmux-yank's y)
       bind -T copy-mode M-w send-keys -X copy-pipe-and-cancel "pbcopy"
+
+      # Emacs-style scrolling: M-v page up, M-V (M-S-v) page down
+      bind -n M-v copy-mode \; send-keys -X page-up
+      bind -T copy-mode M-v send-keys -X page-up
+      bind -T copy-mode M-V send-keys -X page-down
+
+      # Copy entire visible pane to system clipboard
+      bind M-c capture-pane -J \; save-buffer - \; delete-buffer \; run "tmux save-buffer - | pbcopy" \; display "Pane copied to clipboard"
+
+      # Clock: remove seconds (HH:MM only)
+      set -g @tmux_power_time_format '%H:%M'
     '';
   };
 }
