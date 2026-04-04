@@ -171,6 +171,9 @@
       hm-emacs-update = if pkgs.stdenv.isDarwin
         then "cd ${homeDir}/github/mgrbyte/nix-config && nix flake update emacs-config && nix run home-manager -- switch --flake '.#${user}' && launchctl kickstart -k gui/$(id -u)/org.nix-community.home.emacs"
         else "cd ${homeDir}/github/mgrbyte/nix-config && nix flake update emacs-config && nix run home-manager -- switch --flake '.#${user}' && systemctl --user restart emacs";
+      hm-emacs-update-dev = if pkgs.stdenv.isDarwin
+        then "cd ${homeDir}/github/mgrbyte/nix-config && nix flake lock --override-input emacs-config path:${homeDir}/github/mgrbyte/emacs.d && nix run home-manager -- switch --flake '.#${user}' && launchctl kickstart -k gui/$(id -u)/org.nix-community.home.emacs"
+        else "cd ${homeDir}/github/mgrbyte/nix-config && nix flake lock --override-input emacs-config path:${homeDir}/github/mgrbyte/emacs.d && nix run home-manager -- switch --flake '.#${user}' && systemctl --user restart emacs";
 
       # Ripgrep
       search = "rg -p --glob '!node_modules/*'";
