@@ -11,6 +11,7 @@
         plugin = power-theme;
         extraConfig = ''
            set -g @tmux_power_theme 'gold'
+           set -g @tmux_power_time_format '%H:%M'
         '';
       }
       {
@@ -52,9 +53,6 @@
 
       # Copy entire visible pane to system clipboard
       bind M-c capture-pane -J \; save-buffer - \; delete-buffer \; run "tmux save-buffer - | pbcopy" \; display "Pane copied to clipboard"
-
-      # Clock: remove seconds (HH:MM only)
-      set -g @tmux_power_time_format '%H:%M'
     '';
   };
 }
