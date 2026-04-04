@@ -40,9 +40,9 @@
       # Scroll up enters copy mode automatically; prevents escape sequences leaking to shell
       bind -n WheelUpPane if-shell -F -t = "#{mouse_any_flag}" "send-keys -M" "if -Ft= '#{pane_in_mode}' 'send-keys -M' 'copy-mode -e'"
 
-      # Emacs-style paste with prefix + C-y, and C-y without prefix
-      bind C-y paste-buffer
-      bind -n C-y paste-buffer
+      # Emacs-style paste: C-y pastes from system clipboard (no prefix needed)
+      bind C-y run "pbpaste | tmux load-buffer - && tmux paste-buffer"
+      bind -n C-y run "pbpaste | tmux load-buffer - && tmux paste-buffer"
 
       # M-w in copy mode copies to system clipboard (like tmux-yank's y)
       bind -T copy-mode M-w send-keys -X copy-pipe-and-cancel "pbcopy"
