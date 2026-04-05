@@ -12,20 +12,6 @@ in {
   # Config lives at ~/.config/karabiner/karabiner.json - edit manually if needed
   # Current mappings: Cmd+f/b/d/u/l/y/./,/</> -> Meta equivalents in terminals
 
-  # Launch dev-tools (Alacritty + Emacsclient) on login
-  launchd.agents.dev-tools = lib.mkIf isDarwin {
-    enable = true;
-    config = {
-      ProgramArguments = [ "${homeDir}/Applications/dev-tools.app/Contents/MacOS/dev-tools" ];
-      RunAtLoad = true;
-      StandardOutPath = "/tmp/dev-tools.log";
-      StandardErrorPath = "/tmp/dev-tools.err";
-      EnvironmentVariables = {
-        PATH = "${config.home.profileDirectory}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
-      };
-    };
-  };
-
   # Hammerspoon: window tiling (installed manually, config managed by Nix)
   home.file.".hammerspoon/init.lua" = lib.mkIf isDarwin {
     source = ../config/hammerspoon/init.lua;
@@ -150,9 +136,15 @@ fi
 # Open Emacsclient frame (open -a so it doesn't block)
 open "$HOME/Applications/Emacsclient.app"
 
-# Wait for windows to appear, then trigger Hammerspoon tiling
-sleep 2
-/Applications/Hammerspoon.app/Contents/Frameworks/hs/hs -c 'tileApps()' 2>/dev/null || true
+# Poll until Emacs has a window (up to 15 seconds), then tile
+HS="/Applications/Hammerspoon.app/Contents/Frameworks/hs/hs"
+for i in \$(seq 1 30); do
+  if "\$HS" -c 'for _, app in ipairs(hs.application.runningApplications()) do if app:name() == "emacs" and #app:allWindows() > 0 then return "ready" end end return "waiting"' 2>/dev/null | grep -q "ready"; then
+    "\$HS" -c 'tileApps()' 2>/dev/null || true
+    break
+  fi
+  sleep 0.5
+done
 EXEC
       chmod +x "$CONTENTS/MacOS/dev-tools"
 
