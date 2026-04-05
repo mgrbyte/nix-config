@@ -98,9 +98,10 @@
       # Treat path segments as separate words
       WORDCHARS=''${WORDCHARS/\//}
 
-      # SSH key management
-      # - macOS: UseKeychain + AddKeysToAgent in ~/.ssh/config handles persistence
-      # - Linux: keychain utility needed (no macOS Keychain equivalent)
+      # SSH key management: load keys into agent from OS keychain
+      ${lib.optionalString pkgs.stdenv.isDarwin ''
+      /usr/bin/ssh-add --apple-load-keychain 2>/dev/null
+      ''}
       ${lib.optionalString pkgs.stdenv.isLinux ''
       eval $(keychain --eval --quiet --nogui \
         ~/.ssh/id_ed25519_agenix \
