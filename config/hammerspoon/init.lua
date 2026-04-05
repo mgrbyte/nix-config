@@ -36,20 +36,30 @@ function tileApps()
     end
   end
 
-  local emacsclient = hs.application.get("org.gnu.Emacsclient")
-  if emacsclient then
-    for _, win in ipairs(emacsclient:allWindows()) do
-      win:setFrame(rightHalf)
-    end
-  end
-
-  -- Fallback: try the Emacs daemon process
-  if not emacsclient then
-    local emacs = hs.application.get("org.gnu.Emacs")
-    if emacs then
-      for _, win in ipairs(emacs:allWindows()) do
+  -- Emacs daemon has no bundle ID; find by name and pick the one with windows
+  for _, app in ipairs(hs.application.runningApplications()) do
+    if app:name() == "emacs" or app:name() == "Emacsclient" then
+      local wins = app:allWindows()
+      for _, win in ipairs(wins) do
         win:setFrame(rightHalf)
       end
+    end
+  end
+end
+
+-- Retry tiling until Emacs has a window (up to 10 seconds)
+local function tileWithRetry(attempts)
+  tileApps()
+  if attempts > 0 then
+    local hasEmacsWindow = false
+    for _, app in ipairs(hs.application.runningApplications()) do
+      if (app:name() == "emacs" or app:name() == "Emacsclient") and #app:allWindows() > 0 then
+        hasEmacsWindow = true
+        break
+      end
+    end
+    if not hasEmacsWindow then
+      hs.timer.doAfter(1, function() tileWithRetry(attempts - 1) end)
     end
   end
 end
@@ -58,7 +68,7 @@ end
 local watcher = hs.application.watcher.new(function(name, event, app)
   if event == hs.application.watcher.launched then
     if name:lower() == "alacritty" or name == "Emacs" or name == "Emacsclient" then
-      hs.timer.doAfter(1, tileApps)
+      tileWithRetry(10)
     end
   end
 end)
