@@ -7,26 +7,29 @@ in {
   # Living with shortcut arrow on dock icons instead
   targets.darwin.copyApps.enable = false;
 
-  # Install Karabiner-Elements via Homebrew (needs system drivers)
-  home.activation.installKarabiner = lib.mkIf isDarwin (
-    lib.hm.dag.entryAfter ["writeBoundary"] ''
-      # Karabiner needs system drivers that only the official installer provides
-      BREW="/opt/homebrew/bin/brew"
-      if ! /usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "/Applications/Karabiner-Elements.app/Contents/Info.plist" 2>/dev/null | grep -q "org.pqrs.Karabiner-Elements"; then
-        if [[ -x "$BREW" ]]; then
-          echo "Installing Karabiner-Elements via Homebrew..."
-          "$BREW" install --cask karabiner-elements || true
-        else
-          echo "WARNING: Karabiner-Elements requires Homebrew installation."
-          echo "Install Homebrew first, then run: brew install --cask karabiner-elements"
-        fi
-      fi
-    ''
-  );
-
-  # Note: Karabiner config is NOT managed by nix (triggers keyboard dialog on each change)
+  # Karabiner-Elements: Cmd -> Meta remapping for terminals
+  # Installed manually (not via Nix or Homebrew)
   # Config lives at ~/.config/karabiner/karabiner.json - edit manually if needed
   # Current mappings: Cmd+f/b/d/u/l/y/./,/</> -> Meta equivalents in terminals
+
+  # Launch dev-tools (Alacritty + Emacsclient) on login
+  launchd.agents.dev-tools = lib.mkIf isDarwin {
+    enable = true;
+    config = {
+      ProgramArguments = [ "${homeDir}/Applications/dev-tools.app/Contents/MacOS/dev-tools" ];
+      RunAtLoad = true;
+      StandardOutPath = "/tmp/dev-tools.log";
+      StandardErrorPath = "/tmp/dev-tools.err";
+      EnvironmentVariables = {
+        PATH = "${config.home.profileDirectory}/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+      };
+    };
+  };
+
+  # Hammerspoon: window tiling (installed manually, config managed by Nix)
+  home.file.".hammerspoon/init.lua" = lib.mkIf isDarwin {
+    source = ../config/hammerspoon/init.lua;
+  };
 
   # Create Spotlight-indexable aliases for nix apps in ~/Applications
   # Using ~/Applications avoids JAMF/IT restrictions on /Applications
@@ -101,9 +104,65 @@ EXEC
     ''
   );
 
+  # Create dev-tools.app: launches Alacritty + Emacsclient (waits for daemon)
+  home.activation.createDevToolsApp = lib.mkIf isDarwin (
+    lib.hm.dag.entryAfter ["writeBoundary"] ''
+      APP_DIR="$HOME/Applications/dev-tools.app"
+      CONTENTS="$APP_DIR/Contents"
+
+      mkdir -p "$CONTENTS/MacOS" "$CONTENTS/Resources"
+
+      cat > "$CONTENTS/Info.plist" << 'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleExecutable</key>
+  <string>dev-tools</string>
+  <key>CFBundleIconFile</key>
+  <string>AppIcon</string>
+  <key>CFBundleIdentifier</key>
+  <string>org.mgrbyte.dev-tools</string>
+  <key>CFBundleName</key>
+  <string>dev-tools</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleVersion</key>
+  <string>1.0</string>
+</dict>
+</plist>
+PLIST
+
+      EMACSCLIENT_PATH="${pkgs.emacs}/bin/emacsclient"
+      ALACRITTY_PATH="${pkgs.alacritty}/bin/alacritty"
+      cat > "$CONTENTS/MacOS/dev-tools" << EXEC
+#!/bin/bash
+# Wait for Emacs daemon to be ready
+until "$EMACSCLIENT_PATH" -e '(+ 1 1)' >/dev/null 2>&1; do
+  sleep 0.5
+done
+
+# Launch Alacritty (if not already running)
+if ! pgrep -x alacritty >/dev/null 2>&1; then
+  open -a Alacritty
+fi
+
+# Open Emacsclient frame (open -a so it doesn't block)
+open "$HOME/Applications/Emacsclient.app"
+
+# Wait for windows to appear, then trigger Hammerspoon tiling
+sleep 2
+/Applications/Hammerspoon.app/Contents/Frameworks/hs/hs -c 'tileApps()' 2>/dev/null || true
+EXEC
+      chmod +x "$CONTENTS/MacOS/dev-tools"
+
+      touch "$APP_DIR"
+    ''
+  );
+
   # Add apps to Dock
   home.activation.configureDock = lib.mkIf isDarwin (
-    lib.hm.dag.entryAfter ["createAppAliases" "createEmacsclientApp"] ''
+    lib.hm.dag.entryAfter ["createAppAliases" "createEmacsclientApp" "createDevToolsApp"] ''
       DOCKUTIL="${pkgs.dockutil}/bin/dockutil"
       CHANGED=0
 
