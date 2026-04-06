@@ -35,16 +35,30 @@
     "emacs-config": {
       "flake": false,
       "locked": {
-        "lastModified": 1775413002,
-        "narHash": "sha256-SSrLeRgCKRpWecZofzCO9DPbpZ7AG5rVrGRe2/Pa1rI=",
-        "owner": "mgrbyte",
-        "repo": "emacs.d",
-        "rev": "2c6f430ca788e3e200401aa3f32d8a0df921f270",
-        "type": "github"
+        "lastModified": 1775457907,
+        "narHash": "sha256-nxwIux8HM7G3pSKSGYcodcl/Rmq32x5n5RPjicbcJEk=",
+        "path": "/Users/mtr21pqh/github/mgrbyte/emacs.d",
+        "type": "path"
       },
       "original": {
         "owner": "mgrbyte",
         "repo": "emacs.d",
+        "type": "github"
+      }
+    },
+    "emacs-tokyo-theme": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775456740,
+        "narHash": "sha256-ZXfflZFzQXMjlP9PzLTKRnakBAVKjRRnf90sMQqehIo=",
+        "owner": "bbatsov",
+        "repo": "emacs-tokyo-themes",
+        "rev": "1b6ad5621d0e044be1f6777b0474bdfd180ef58c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "bbatsov",
+        "repo": "emacs-tokyo-themes",
         "type": "github"
       }
     },
@@ -263,6 +277,7 @@
       "inputs": {
         "emacs-abyss-theme": "emacs-abyss-theme",
         "emacs-config": "emacs-config",
+        "emacs-tokyo-theme": "emacs-tokyo-theme",
         "home-manager": "home-manager",
         "home-manager-secrets": "home-manager-secrets",
         "nix-casks": "nix-casks",

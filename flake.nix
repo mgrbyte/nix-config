@@ -19,6 +19,11 @@
       flake = false;
     };
 
+    emacs-tokyo-theme = {
+      url = "github:bbatsov/emacs-tokyo-themes";
+      flake = false;
+    };
+
     nix-casks = {
       url = "github:atahanyorganci/nix-casks";
     };
@@ -49,6 +54,7 @@
           inherit inputs emacs-config nix-colors user;
           nix-secrets = inputs.nix-secrets;
           emacs-abyss-theme = inputs.emacs-abyss-theme;
+          emacs-tokyo-theme = inputs.emacs-tokyo-theme;
         };
         modules = [
           nix-colors.homeManagerModules.default

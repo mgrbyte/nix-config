@@ -10,7 +10,7 @@
       {
         plugin = power-theme;
         extraConfig = ''
-           set -g @tmux_power_theme 'gold'
+           set -g @tmux_power_theme '#bb9af7'
            set -g @tmux_power_time_format '%H:%M'
         '';
       }

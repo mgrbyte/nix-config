@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, emacs-abyss-theme, ... }:
+{ config, pkgs, lib, inputs, emacs-abyss-theme, emacs-tokyo-theme, ... }:
 let
   isDarwin = pkgs.stdenv.isDarwin;
   isLinux = pkgs.stdenv.isLinux;
@@ -16,6 +16,14 @@ let
     pname = "abyss-theme";
     version = "0.7.2";
     src = emacs-abyss-theme;
+  };
+
+  # Build tokyo-night themes from flake input (bbatsov)
+  tokyo-theme-pkg = pkgs.emacsPackages.trivialBuild {
+    pname = "tokyo-night-themes";
+    version = "0.1.0";
+    src = emacs-tokyo-theme;
+    files = [ "*.el" ];
   };
 
   # Build claude-code.el from github (not in nixpkgs)
@@ -76,6 +84,7 @@ let
   # Bundle Emacs with all packages (including custom ones)
   myEmacs = (pkgs.emacsPackagesFor pkgs.emacs).emacsWithPackages (epkgs: [
     abyss-theme-pkg
+    tokyo-theme-pkg
     claude-code-el-pkg
     claude-code-ide-pkg
     emacs-mcp-server-pkg
