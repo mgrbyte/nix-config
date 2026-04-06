@@ -4,12 +4,8 @@ let
   isLinux = pkgs.stdenv.isLinux;
   casks = inputs.nix-casks.packages.${pkgs.stdenv.hostPlatform.system};
 
-  # One entry per cross-platform GUI app.
-  # Add here when you want an app on both Linux (nixpkgs) and macOS (nix-casks).
-  crossPlatformGui = map (app: if isDarwin then app.darwin else app.linux) [
-    { linux = pkgs.firefox;           darwin = casks.firefox; }
-    { linux = pkgs.gimp-with-plugins; darwin = casks.gimp; }
-  ];
+  # Cross-platform GUI apps: listed separately per platform to avoid
+  # nix-casks broken bin/ wrapper symlinks on macOS.
 
   # Build abyss-theme from flake input
   abyss-theme-pkg = pkgs.emacsPackages.trivialBuild {
@@ -243,12 +239,16 @@ in {
 
     # Platform-specific pinentry
     (if isDarwin then pinentry_mac else pinentry-curses)
-  ] ++ lib.optionals isLinux ([
+  ] ++ lib.optionals isLinux [
     wl-clipboard
-  ] ++ crossPlatformGui)
+    pkgs.firefox
+    pkgs.gimp-with-plugins
+  ]
   ++ lib.optionals isDarwin ([
     pkgs.dockutil  # Dock management tool
-  ] ++ crossPlatformGui ++ (with casks; [
+  ] ++ (with casks; [
+    firefox
+    gimp
     # macOS-only GUI applications (no Linux equivalent wanted)
     visual-studio-code
     raycast
