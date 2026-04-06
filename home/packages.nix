@@ -78,9 +78,7 @@ let
   };
 
   # Bundle Emacs with all packages (including custom ones)
-  # Use pgtk (native Wayland) on Linux; standard emacs on macOS
-  emacsPackage = if isLinux then pkgs.emacs-pgtk else pkgs.emacs;
-  myEmacs = (pkgs.emacsPackagesFor emacsPackage).emacsWithPackages (epkgs: [
+  myEmacs = (pkgs.emacsPackagesFor pkgs.emacs).emacsWithPackages (epkgs: [
     abyss-theme-pkg
     tokyo-theme-pkg
     claude-code-el-pkg
