@@ -2,6 +2,20 @@
 
 let
   p = config.colorScheme.palette;
+
+  # On Linux, option_as_alt is macOS-only and ignored. The HHKB cmd key sends
+  # Super (Mod4); generate Super+letter → ESC+letter bindings so it acts as Meta.
+  linuxSuperAsMetaBindings = lib.optionalString pkgs.stdenv.isLinux (
+    lib.concatMapStrings (letter:
+      let upper = lib.strings.toUpper letter; in ''
+
+        [[keyboard.bindings]]
+        key = "${upper}"
+        mods = "Super"
+        chars = "\u001b${letter}"
+      ''
+    ) (lib.stringToCharacters "abcdefghijklmnopqrstuvwxyz")
+  );
 in {
   home.file = {
     # Alacritty terminal config with nix-colors
@@ -96,6 +110,7 @@ in {
       key = "V"
       mods = "Command|Shift"
       chars = "\u001bV"
+      ${linuxSuperAsMetaBindings}
     '';
   };
 }

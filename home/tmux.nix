@@ -1,6 +1,9 @@
 { config, pkgs, lib, ... }:
 
-{
+let
+  paste = if pkgs.stdenv.isDarwin then "pbpaste" else "wl-paste";
+  copy  = if pkgs.stdenv.isDarwin then "pbcopy"  else "wl-copy";
+in {
   programs.tmux = {
     enable = true;
     plugins = with pkgs.tmuxPlugins; [
@@ -41,11 +44,11 @@
       bind -n WheelUpPane if-shell -F -t = "#{mouse_any_flag}" "send-keys -M" "if -Ft= '#{pane_in_mode}' 'send-keys -M' 'copy-mode -e'"
 
       # Emacs-style paste: C-y pastes from system clipboard (no prefix needed)
-      bind C-y run "pbpaste | tmux load-buffer - && tmux paste-buffer"
-      bind -n C-y run "pbpaste | tmux load-buffer - && tmux paste-buffer"
+      bind C-y run "${paste} | tmux load-buffer - && tmux paste-buffer"
+      bind -n C-y run "${paste} | tmux load-buffer - && tmux paste-buffer"
 
       # M-w in copy mode copies to system clipboard (like tmux-yank's y)
-      bind -T copy-mode M-w send-keys -X copy-pipe-and-cancel "pbcopy"
+      bind -T copy-mode M-w send-keys -X copy-pipe-and-cancel "${copy}"
 
       # Emacs-style scrolling: M-v page up, M-V (M-S-v) page down
       bind -n M-v copy-mode \; send-keys -X page-up
@@ -53,7 +56,7 @@
       bind -T copy-mode M-V send-keys -X page-down
 
       # Copy entire visible pane to system clipboard
-      bind M-c capture-pane -J \; save-buffer - \; delete-buffer \; run "tmux save-buffer - | pbcopy" \; display "Pane copied to clipboard"
+      bind M-c capture-pane -J \; save-buffer - \; delete-buffer \; run "tmux save-buffer - | ${copy}" \; display "Pane copied to clipboard"
     '';
   };
 }

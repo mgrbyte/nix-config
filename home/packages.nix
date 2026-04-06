@@ -241,6 +241,7 @@ in {
     (if isDarwin then pinentry_mac else pinentry-curses)
   ] ++ lib.optionals isLinux [
     wl-clipboard
+    google-chrome
     pkgs.firefox
     pkgs.gimp-with-plugins
   ]
