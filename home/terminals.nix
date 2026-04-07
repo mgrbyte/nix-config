@@ -22,8 +22,8 @@ in {
     ".config/alacritty/alacritty.toml".text = ''
       # Window configuration
       [window]
-      dimensions = { columns = 207, lines = 58 }
-      padding = { x = 12, y = 12 }
+      dimensions = { columns = 207, lines = 60 }
+      padding = { x = 12, y = 18 }
       decorations = "Full"
       opacity = 1.0
       option_as_alt = "Both"
