@@ -2,18 +2,28 @@
 
 let
   copy = if pkgs.stdenv.isDarwin then "pbcopy" else "wl-copy";
+  paste = if pkgs.stdenv.isDarwin then "pbpaste" else "wl-paste";
 in {
   programs.tmux = {
     enable = true;
     plugins = with pkgs.tmuxPlugins; [
       sensible
       yank
-      prefix-highlight
       {
-        plugin = power-theme;
+        plugin = tokyo-night-tmux;
         extraConfig = ''
-           set -g @tmux_power_theme '#bb9af7'
-           set -g @tmux_power_time_format '%A %d/%m/%Y  %-I:%M %p'
+          # Ensure Nix bash 5.x is used by plugin scripts (macOS ships bash 3.2
+          # which doesn't support associative arrays needed by tokyo-night-tmux)
+          set-environment -g PATH "${config.home.profileDirectory}/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+          set -g @tokyo-night-tmux_theme 'night'
+          set -g @tokyo-night-tmux_date_format 'DMY'
+          set -g @tokyo-night-tmux_time_format '24H'
+          set -g @tokyo-night-tmux_show_datetime 1
+          set -g @tokyo-night-tmux_show_path 1
+          set -g @tokyo-night-tmux_path_format 'relative'
+          set -g @tokyo-night-tmux_show_music 1
+          set -g @tokyo-night-tmux_show_battery_widget 1
+          set -g @tokyo-night-tmux_show_hostname 1
         '';
       }
       {
@@ -49,6 +59,9 @@ in {
       bind -n M-v copy-mode \; send-keys -X page-up
       bind -T copy-mode M-v send-keys -X page-up
       bind -T copy-mode M-V send-keys -X page-down
+
+      # Ctrl-Shift-v pastes from system clipboard
+      bind -n C-S-v run "${paste} | tmux load-buffer - && tmux paste-buffer"
 
       # Copy entire visible pane to system clipboard
       bind M-c capture-pane -J \; save-buffer - \; delete-buffer \; run "tmux save-buffer - | ${copy}" \; display "Pane copied to clipboard"

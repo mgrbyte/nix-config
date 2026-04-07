@@ -148,6 +148,7 @@ let
 in {
   home.packages = with pkgs; [
     # General packages for development and system management
+    bashInteractive
     bash-completion
     bat
     btop
@@ -198,6 +199,7 @@ in {
     hunspellDicts.cy_GB
 
     # development tools / text utils
+    bc
     awscli2
     cmake
     libtool
@@ -242,11 +244,13 @@ in {
   ] ++ lib.optionals isLinux [
     wl-clipboard
     google-chrome
+    playerctl
     pkgs.firefox
     pkgs.gimp-with-plugins
   ]
   ++ lib.optionals isDarwin ([
     pkgs.dockutil  # Dock management tool
+    nowplaying-cli
   ] ++ (with casks; [
     firefox
     gimp

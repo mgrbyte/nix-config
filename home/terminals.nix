@@ -110,6 +110,12 @@ in {
       key = "V"
       mods = "Command|Shift"
       chars = "\u001bV"
+
+      # Ctrl+Shift+v pastes from system clipboard
+      [[keyboard.bindings]]
+      key = "V"
+      mods = "Control|Shift"
+      action = "Paste"
       ${linuxSuperAsMetaBindings}
     '';
   };
