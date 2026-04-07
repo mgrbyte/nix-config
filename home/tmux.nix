@@ -13,7 +13,7 @@ in {
         plugin = power-theme;
         extraConfig = ''
            set -g @tmux_power_theme '#bb9af7'
-           set -g @tmux_power_time_format '%H:%M'
+           set -g @tmux_power_time_format '%d/%m/%Y  %-I:%M %p'
         '';
       }
       {
