@@ -60,8 +60,8 @@
         ids = [ "04fe:0016" ];
         settings = {
           main = {
-            leftmeta = "overloaded(super, alt)";
-            rightmeta = "overloaded(super, alt)";
+            leftmeta = "overloaded(leftmeta,leftalt)";
+            rightmeta = "overloaded(rightmeta,rightalt)";
           };
         };
       };
