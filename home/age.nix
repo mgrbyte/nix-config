@@ -59,14 +59,21 @@
   };
 
   # Regenerate SSH public keys from private keys on activation.
-  # Only runs when the .pub is missing or older than the private key
-  # (i.e. after secret rotation), avoiding passphrase prompts on every switch.
+  # Compares a hash of the private key content to detect actual changes
+  # (agenix always touches the file, so mtime comparison is unreliable).
+  # Only prompts for passphrase on first run or after secret rotation.
   home.activation.generateSshPubKeys = lib.hm.dag.entryAfter ["writeBoundary"] ''
     _regen_pub() {
       local priv="$1"
       local pub="$priv.pub"
-      if [[ -f "$priv" ]] && { [[ ! -f "$pub" ]] || [[ "$priv" -nt "$pub" ]]; }; then
-        ${pkgs.openssh}/bin/ssh-keygen -y -f "$priv" > "$pub"
+      local hash_file="$pub.keyhash"
+      if [[ -f "$priv" ]]; then
+        local current_hash
+        current_hash=$(${pkgs.coreutils}/bin/sha256sum "$priv" | cut -d' ' -f1)
+        if [[ ! -f "$pub" ]] || [[ "$(cat "$hash_file" 2>/dev/null)" != "$current_hash" ]]; then
+          ${pkgs.openssh}/bin/ssh-keygen -y -f "$priv" > "$pub"
+          echo "$current_hash" > "$hash_file"
+        fi
       fi
     }
     _regen_pub ${homeDir}/.ssh/id_mtr21pqh_github
