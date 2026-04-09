@@ -50,7 +50,7 @@
     pulse.enable = true;
   };
 
-  # Remap HHKB Studio Cmd key (Super) at the evdev level:
+  # Remap HHKB Studio Cmd key (Super) at the evdev level using keyd overload():
   # - tap Super alone  → Super (GNOME Activities launcher still works)
   # - hold Super + key → Alt+key (terminal sees Meta, no GNOME interception)
   services.keyd = {
@@ -60,8 +60,8 @@
         ids = [ "04fe:0016" ];
         settings = {
           main = {
-            leftmeta = "overloaded(leftmeta,leftalt)";
-            rightmeta = "overloaded(rightmeta,rightalt)";
+            leftmeta = "overload(alt,leftmeta)";
+            rightmeta = "overload(alt,rightmeta)";
           };
         };
       };
