@@ -58,16 +58,19 @@
     executable = true;
   };
 
-  # Regenerate SSH public keys from private keys on activation
-  # This ensures .pub files always match the canonical private keys
-  # Keys may not exist on first run (created by home-manager-secrets service)
+  # Regenerate SSH public keys from private keys on activation.
+  # Only runs when the .pub is missing or older than the private key
+  # (i.e. after secret rotation), avoiding passphrase prompts on every switch.
   home.activation.generateSshPubKeys = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    if [[ -f ${homeDir}/.ssh/id_mtr21pqh_github ]]; then
-      ${pkgs.openssh}/bin/ssh-keygen -y -f ${homeDir}/.ssh/id_mtr21pqh_github > ${homeDir}/.ssh/id_mtr21pqh_github.pub
-    fi
-    if [[ -f ${homeDir}/.ssh/id_ed25519_mtr21pqh ]]; then
-      ${pkgs.openssh}/bin/ssh-keygen -y -f ${homeDir}/.ssh/id_ed25519_mtr21pqh > ${homeDir}/.ssh/id_ed25519_mtr21pqh.pub
-    fi
+    _regen_pub() {
+      local priv="$1"
+      local pub="$priv.pub"
+      if [[ -f "$priv" ]] && { [[ ! -f "$pub" ]] || [[ "$priv" -nt "$pub" ]]; }; then
+        ${pkgs.openssh}/bin/ssh-keygen -y -f "$priv" > "$pub"
+      fi
+    }
+    _regen_pub ${homeDir}/.ssh/id_mtr21pqh_github
+    _regen_pub ${homeDir}/.ssh/id_ed25519_mtr21pqh
   '';
 
   # Load SSH keys into agent (and macOS keychain) for git signing
