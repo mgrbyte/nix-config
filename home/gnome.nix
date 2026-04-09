@@ -33,4 +33,21 @@ lib.mkIf pkgs.stdenv.isLinux {
       fi
     fi
   '';
+
+  # dev-tools: launch Alacritty + Emacsclient and tile side by side.
+  # Linux equivalent of dev-tools.app on macOS.
+  home.file.".local/bin/dev-tools" = {
+    source = ../scripts/dev-tools;
+    executable = true;
+  };
+
+  xdg.desktopEntries.dev-tools = {
+    name = "dev-tools";
+    genericName = "Development Environment";
+    comment = "Launch Alacritty and Emacsclient tiled side by side";
+    exec = "${config.home.homeDirectory}/.local/bin/dev-tools";
+    icon = "emacs";
+    type = "Application";
+    categories = [ "Development" "Utility" ];
+  };
 }

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Launch Alacritty + Emacsclient and tile them side by side on the largest monitor.
+# Linux equivalent of dev-tools.app on macOS (which uses Hammerspoon for tiling).
+#
+# Requires the focus-window@mgrbyte GNOME Shell extension to be active.
+
+set -euo pipefail
+
+EMACSCLIENT="${HOME}/.nix-profile/bin/emacsclient"
+ALACRITTY="${HOME}/.nix-profile/bin/alacritty"
+
+# Wait for Emacs daemon to be ready
+until "$EMACSCLIENT" -e '(+ 1 1)' >/dev/null 2>&1; do
+  sleep 0.5
+done
+
+# Launch Alacritty if not already running
+if ! pgrep -x alacritty >/dev/null 2>&1; then
+  "$ALACRITTY" &
+fi
+
+# Open an Emacsclient frame
+"$EMACSCLIENT" -c &
+
+# Poll until both Alacritty and Emacs windows are present, then tile.
+# Mirrors the Hammerspoon retry loop in dev-tools.app (up to 15 seconds).
+for i in $(seq 1 30); do
+  classes=$(gdbus call --session \
+    --dest org.gnome.Shell \
+    --object-path /org/mgrbyte/FocusWindow \
+    --method org.mgrbyte.FocusWindow.GetWindowClasses 2>/dev/null || echo "")
+  if echo "$classes" | grep -qi "alacritty" && echo "$classes" | grep -qi "emacs"; then
+    gdbus call --session \
+      --dest org.gnome.Shell \
+      --object-path /org/mgrbyte/FocusWindow \
+      --method org.mgrbyte.FocusWindow.TileDevTools 2>/dev/null || true
+    break
+  fi
+  sleep 0.5
+done
