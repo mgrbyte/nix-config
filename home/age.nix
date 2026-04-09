@@ -32,7 +32,7 @@
       };
       "uv-config" = {
         source = "${nix-secrets}/uv.toml.age";
-        symlinks = [ "${homeDir}/.config/uv/uv.toml" ];
+        symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.config/uv/uv.toml" ];
       };
       "work.netrc" = {
         source = "${nix-secrets}/work.netrc.age";
