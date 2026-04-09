@@ -78,6 +78,12 @@
       homeConfigurations."mgrbyte-x86_64-linux" = mkHomeConfig { system = "x86_64-linux"; user = "mgrbyte"; };
       homeConfigurations."mgrbyte-aarch64-linux" = mkHomeConfig { system = "aarch64-linux"; user = "mgrbyte"; };
 
+      # NixOS system configuration for mgrbyte's personal Linux machine
+      nixosConfigurations."nixos" = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [ ./nixos/configuration.nix ];
+      };
+
       # Dev shell for working on this config
       devShells = forAllSystems (system:
         let pkgs = nixpkgs.legacyPackages.${system}; in {
