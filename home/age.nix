@@ -1,4 +1,4 @@
-{ config, pkgs, lib, homeDir, nix-secrets, ... }:
+{ config, pkgs, lib, homeDir, user, nix-secrets, ... }:
 
 {
   secrets = {
@@ -36,10 +36,11 @@
       };
       "work.netrc" = {
         source = "${nix-secrets}/work.netrc.age";
-        symlinks = [ "${homeDir}/.netrc" ];
+        symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.netrc" ];
       };
       "personal.netrc" = {
         source = "${nix-secrets}/personal.netrc.age";
+        symlinks = lib.optionals (user == "mgrbyte") [ "${homeDir}/.netrc" ];
       };
       "allowed-signers" = {
         source = "${nix-secrets}/allowed-signers.age";
