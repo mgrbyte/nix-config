@@ -1,0 +1,7 @@
+{
+  "name": "Focus Window",
+  "description": "D-Bus interface to focus windows by WM class name",
+  "uuid": "focus-window@mgrbyte",
+  "shell-version": ["45", "46", "47", "48", "49"],
+  "version": 1
+}

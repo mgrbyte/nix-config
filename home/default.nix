@@ -35,6 +35,7 @@ in {
     ./terminals.nix
     ./tmux.nix
     ./darwin.nix
+    ./gnome.nix
     ./age.nix
     ./llms.nix
     ./python-tooling.nix
@@ -56,13 +57,6 @@ in {
 
   # Ensure XDG_DATA_DIRS includes HM profile paths for GNOME app discovery
   targets.genericLinux.enable = isLinux;
-
-  # Remap Caps Lock to Ctrl in GNOME (Linux only; macOS handled via Karabiner)
-  dconf.settings = lib.mkIf isLinux {
-    "org/gnome/desktop/input-sources" = {
-      xkb-options = [ "ctrl:nocaps" ];
-    };
-  };
 
   # Custom scripts
   home.file.".local/bin/sync-uv-tools" = {
