@@ -50,9 +50,9 @@
     pulse.enable = true;
   };
 
-  # Remap HHKB Studio Cmd key (Super) to Alt at the evdev level so that
-  # GNOME Wayland does not intercept Super+letter before terminals see it.
-  # Alt is natively Meta in Emacs and tmux without any further configuration.
+  # Remap HHKB Studio Cmd key (Super) at the evdev level:
+  # - tap Super alone  → Super (GNOME Activities launcher still works)
+  # - hold Super + key → Alt+key (terminal sees Meta, no GNOME interception)
   services.keyd = {
     enable = true;
     keyboards = {
@@ -60,8 +60,8 @@
         ids = [ "04fe:0016" ];
         settings = {
           main = {
-            leftmeta = "leftalt";
-            rightmeta = "rightalt";
+            leftmeta = "overloaded(super, alt)";
+            rightmeta = "overloaded(super, alt)";
           };
         };
       };
