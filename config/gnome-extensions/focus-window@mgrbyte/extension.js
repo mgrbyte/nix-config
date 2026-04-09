@@ -78,16 +78,20 @@ export default class FocusWindowExtension {
       .get_active_workspace()
       .get_work_area_for_monitor(bestMonitor)
     const halfW = Math.floor(work.width / 2)
+    // Add extra height so character-grid-snapping windows (Emacs, Alacritty)
+    // round up to fill the work area rather than leaving a gap at the bottom.
+    // Mutter constrains the actual frame to the work area boundary.
+    const fullH = work.height + 50
     for (const actor of global.get_window_actors()) {
       const win = actor.meta_window
       if (win.get_window_type() !== Meta.WindowType.NORMAL) continue
       const cls = win.get_wm_class() ?? ''
       if (/alacritty/i.test(cls)) {
         win.unmaximize(Meta.MaximizeFlags.BOTH)
-        win.move_resize_frame(false, work.x, work.y, halfW, work.height)
+        win.move_resize_frame(false, work.x, work.y, halfW, fullH)
       } else if (/emacs/i.test(cls)) {
         win.unmaximize(Meta.MaximizeFlags.BOTH)
-        win.move_resize_frame(false, work.x + halfW, work.y, work.width - halfW, work.height)
+        win.move_resize_frame(false, work.x + halfW, work.y, work.width - halfW, fullH)
       }
     }
   }
