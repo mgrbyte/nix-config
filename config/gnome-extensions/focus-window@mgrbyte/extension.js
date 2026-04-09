@@ -74,7 +74,9 @@ export default class FocusWindowExtension {
         bestMonitor = i
       }
     }
-    const work = global.display.get_monitor_work_area(bestMonitor)
+    const work = global.workspace_manager
+      .get_active_workspace()
+      .get_work_area_for_monitor(bestMonitor)
     const halfW = Math.floor(work.width / 2)
     for (const actor of global.get_window_actors()) {
       const win = actor.meta_window
