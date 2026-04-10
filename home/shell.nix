@@ -99,14 +99,9 @@
       WORDCHARS=''${WORDCHARS/\//}
 
       # SSH key management: load keys into agent from OS keychain
+      # Linux: GNOME keyring daemon acts as SSH agent and handles key caching
       ${lib.optionalString pkgs.stdenv.isDarwin ''
       /usr/bin/ssh-add --apple-load-keychain 2>/dev/null
-      ''}
-      ${lib.optionalString pkgs.stdenv.isLinux ''
-      eval $(keychain --eval --quiet --nogui \
-        ~/.ssh/id_ed25519_agenix \
-        ~/.ssh/id_mgrbyte_github \
-        ${lib.optionalString (user == "mtr21pqh") "~/.ssh/id_ed25519_mtr21pqh"})
       ''}
 
       ${lib.optionalString (user == "mtr21pqh") ''
@@ -195,7 +190,6 @@
       pbcopy = lib.mkIf pkgs.stdenv.isLinux "wl-copy";
       pbpaste = lib.mkIf pkgs.stdenv.isLinux "wl-paste";
 
-      keychain = "keychain --nocolor";
       ls = "ls --color=auto";
       ll = "ls -lh";
       l = "ls -l";

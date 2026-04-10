@@ -165,7 +165,6 @@ in {
     age
     age-plugin-yubikey
     gnupg
-    keychain
     libfido2
 
     # Terminal
