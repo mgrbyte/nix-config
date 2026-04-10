@@ -59,6 +59,7 @@ in {
       user = {
         name = name;
         email = personalEmail;
+        signingkey = "${homeDir}/.ssh/id_mgrbyte_github.pub";
       };
       alias = {
         bcu = "!git fetch -p && git branch --merged | grep -v '\\*\\|main\\|master' | xargs -n 1 git branch -D";
@@ -98,7 +99,6 @@ in {
       tag.gpgsign = true;
       gpg.format = "ssh";
       gpg.ssh.allowedSignersFile = "${homeDir}/.ssh/allowed_signers";
-      gpg.ssh.signingKey = "${homeDir}/.ssh/id_mgrbyte_github.pub";
       pull.rebase = true;
       rebase.autoStash = true;
       # Work directories override email and signing key; all other paths use personal defaults above
