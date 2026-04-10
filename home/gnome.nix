@@ -1,6 +1,23 @@
 { config, pkgs, lib, ... }:
 
 lib.mkIf pkgs.stdenv.isLinux {
+  # Use a proper systemd ssh-agent instead of GCR's ssh component.
+  # GCR's ssh-agent intercepts sign requests and calls ensure_key() which
+  # spawns a GUI prompt via gcr-ssh-askpass; from a headless context (Emacs
+  # daemon systemd service) that prompt never appears and ssh-keygen -Y sign
+  # hangs forever.  The home-manager ssh-agent service sets SSH_AUTH_SOCK via
+  # systemd --user set-environment so ALL user services including the Emacs
+  # daemon get the correct socket without needing a display.
+  services.ssh-agent.enable = true;
+
+  # Prevent GCR from claiming the SSH agent role at login.
+  xdg.configFile."autostart/gnome-keyring-ssh.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=SSH Key Agent
+    Hidden=true
+  '';
+
   # Remap Caps Lock to Ctrl in GNOME
   dconf.settings."org/gnome/desktop/input-sources" = {
     xkb-options = [ "ctrl:nocaps" ];
