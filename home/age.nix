@@ -10,17 +10,17 @@
 
     # Define secrets from nix-secrets repo
     file = {
-      "id_mtr21pqh_github" = {
-        source = "${nix-secrets}/id_mtr21pqh_github.age";
-        symlinks = [ "${homeDir}/.ssh/id_mtr21pqh_github" ];
+      "id_mgrbyte_github" = {
+        source = "${nix-secrets}/id_mgrbyte_github.age";
+        symlinks = [ "${homeDir}/.ssh/id_mgrbyte_github" ];
       };
       "id_ed25519_mtr21pqh" = {
         source = "${nix-secrets}/id_ed25519_mtr21pqh.age";
-        symlinks = [ "${homeDir}/.ssh/id_ed25519_mtr21pqh" ];
+        symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.ssh/id_ed25519_mtr21pqh" ];
       };
-      "ssh-config-external" = {
-        source = "${nix-secrets}/ssh-config-external.age";
-        symlinks = [ "${homeDir}/.ssh/config_external" ];
+      "ssh-config-work" = {
+        source = "${nix-secrets}/ssh-config-work.age";
+        symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.ssh/config_work" ];
       };
       "huggingface-token" = {
         source = "${nix-secrets}/huggingface-token.age";
@@ -28,7 +28,7 @@
       };
       "work-env" = {
         source = "${nix-secrets}/work.env.age";
-        symlinks = [ "${homeDir}/.work.env" ];
+        symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.work.env" ];
       };
       "uv-config" = {
         source = "${nix-secrets}/uv.toml.age";
@@ -76,16 +76,16 @@
         fi
       fi
     }
-    _regen_pub ${homeDir}/.ssh/id_mtr21pqh_github
-    _regen_pub ${homeDir}/.ssh/id_ed25519_mtr21pqh
+    _regen_pub ${homeDir}/.ssh/id_mgrbyte_github
+    ${lib.optionalString (user == "mtr21pqh") "_regen_pub ${homeDir}/.ssh/id_ed25519_mtr21pqh"}
   '';
 
   # Load SSH keys into agent (and macOS keychain) for git signing
   # Linux uses keychain in shell.nix instead
   home.activation.loadSshKeysToAgent = lib.mkIf pkgs.stdenv.isDarwin (
     lib.hm.dag.entryAfter ["generateSshPubKeys"] ''
-      /usr/bin/ssh-add --apple-use-keychain ${homeDir}/.ssh/id_ed25519_mtr21pqh 2>/dev/null || true
-      /usr/bin/ssh-add --apple-use-keychain ${homeDir}/.ssh/id_mtr21pqh_github 2>/dev/null || true
+      ${lib.optionalString (user == "mtr21pqh") "/usr/bin/ssh-add --apple-use-keychain ${homeDir}/.ssh/id_ed25519_mtr21pqh 2>/dev/null || true"}
+      /usr/bin/ssh-add --apple-use-keychain ${homeDir}/.ssh/id_mgrbyte_github 2>/dev/null || true
     ''
   );
 }

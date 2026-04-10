@@ -2,7 +2,6 @@
 
 let
   name = "Matt Russell";
-  email = "m.russell@bangor.ac.uk";
   isDarwin = pkgs.stdenv.isDarwin;
   isLinux = pkgs.stdenv.isLinux;
   homeDir = if isDarwin then "/Users/${user}" else "/home/${user}";
@@ -43,7 +42,7 @@ in {
 
   # Make shared variables available to all modules
   _module.args = {
-    inherit name user email homeDir nixPath emacs-config emacs-abyss-theme nix-secrets;
+    inherit name user homeDir nixPath emacs-config emacs-abyss-theme nix-secrets;
   };
 
   home.username = user;

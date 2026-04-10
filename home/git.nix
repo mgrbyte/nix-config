@@ -1,8 +1,10 @@
-{ config, pkgs, lib, name, email, user, homeDir, ... }:
+{ config, pkgs, lib, name, user, homeDir, ... }:
 
 let
   isDarwin = pkgs.stdenv.isDarwin;
   isLinux = pkgs.stdenv.isLinux;
+  personalEmail = "mgrbyte@member.fsf.org";
+  workEmail = "m.russell@bangor.ac.uk";
 in {
   programs.git = {
     enable = true;
@@ -56,7 +58,7 @@ in {
     settings = {
       user = {
         name = name;
-        email = email;
+        email = personalEmail;
       };
       alias = {
         bcu = "!git fetch -p && git branch --merged | grep -v '\\*\\|main\\|master' | xargs -n 1 git branch -D";
@@ -96,19 +98,17 @@ in {
       tag.gpgsign = true;
       gpg.format = "ssh";
       gpg.ssh.allowedSignersFile = "${homeDir}/.ssh/allowed_signers";
+      gpg.ssh.signingKey = "${homeDir}/.ssh/id_mgrbyte_github.pub";
       pull.rebase = true;
       rebase.autoStash = true;
-      # Directory-based signing keys
-      "includeIf \"gitdir:${homeDir}/github/mgrbyte/\"" = {
-        path = "${homeDir}/.config/git/personal.inc";
-      };
+      # Work directories override email and signing key; all other paths use personal defaults above
       "includeIf \"gitdir:${homeDir}/gitlab/\"" = {
         path = "${homeDir}/.config/git/work.inc";
       };
       "includeIf \"gitdir:${homeDir}/github/techiaith/\"" = {
         path = "${homeDir}/.config/git/work.inc";
       };
-      "includeIf \"gitdir:${homeDir}/huggingface/\"" = {
+      "includeIf \"gitdir:${homeDir}/github/huggingface/techiaith/\"" = {
         path = "${homeDir}/.config/git/work.inc";
       };
     };
@@ -117,8 +117,8 @@ in {
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
-    includes = [
-      (if isLinux then "/home/${user}/.ssh/config_external" else "/Users/${user}/.ssh/config_external")
+    includes = lib.optionals (user == "mtr21pqh") [
+      (if isLinux then "/home/${user}/.ssh/config_work" else "/Users/${user}/.ssh/config_work")
     ];
     matchBlocks = {
       "*" = {
@@ -129,20 +129,16 @@ in {
       "github.com" = {
         identitiesOnly = true;
         identityFile = [
-          (if isLinux then "/home/${user}/.ssh/id_mtr21pqh_github" else "/Users/${user}/.ssh/id_mtr21pqh_github")
+          (if isLinux then "/home/${user}/.ssh/id_mgrbyte_github" else "/Users/${user}/.ssh/id_mgrbyte_github")
         ];
       };
     };
   };
 
-  # Git config includes for directory-based signing keys
-  home.file.".config/git/personal.inc".text = ''
-    [user]
-      signingkey = ${homeDir}/.ssh/id_mtr21pqh_github.pub
-  '';
-
+  # Git config include for work directories (overrides global personal defaults)
   home.file.".config/git/work.inc".text = ''
     [user]
+      email = ${workEmail}
       signingkey = ${homeDir}/.ssh/id_ed25519_mtr21pqh.pub
   '';
 }

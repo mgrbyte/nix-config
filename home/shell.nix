@@ -105,14 +105,16 @@
       ${lib.optionalString pkgs.stdenv.isLinux ''
       eval $(keychain --eval --quiet --nogui \
         ~/.ssh/id_ed25519_agenix \
-        ~/.ssh/id_mtr21pqh_github \
-        ~/.ssh/id_ed25519_mtr21pqh)
+        ~/.ssh/id_mgrbyte_github \
+        ${lib.optionalString (user == "mtr21pqh") "~/.ssh/id_ed25519_mtr21pqh"})
       ''}
 
+      ${lib.optionalString (user == "mtr21pqh") ''
       # Load work environment (API keys)
       if [[ -e "$HOME/.work.env" ]]; then
         source "$HOME/.work.env"
       fi
+      ''}
 
       # Check for broken uv tools (silent unless broken)
       if [[ -x "$HOME/.local/bin/sync-uv-tools" ]]; then
