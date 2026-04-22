@@ -15,7 +15,6 @@ in {
       "#*#"
       ".#*"
       ".dir-locals.el"
-      ".serena/"
       ".idea/**/aws.xml"
       ".idea/**/contentModel.xml"
       ".idea/**/dataSources.ids"
