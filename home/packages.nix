@@ -115,11 +115,13 @@ let
     lsp-ui
     magit
     markdown-mode
+    mermaid-mode
     nerd-icons
     nerd-icons-completion
     nerd-icons-dired
     nerd-icons-ibuffer
     nix-mode
+    ob-mermaid
     org
     org-mcp
     paredit
