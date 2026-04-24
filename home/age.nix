@@ -42,6 +42,10 @@
         source = "${nix-secrets}/personal.netrc.age";
         symlinks = lib.optionals (user == "mgrbyte") [ "${homeDir}/.netrc" ];
       };
+      "init-gitlab-sync-config" = {
+        source = "${nix-secrets}/init-gitlab-sync-config.el.age";
+        symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.emacs.d/lisp/init-gitlab-sync-config.el" ];
+      };
       "allowed-signers" = {
         source = "${nix-secrets}/allowed-signers.age";
         symlinks = [ "${homeDir}/.ssh/allowed_signers" ];
