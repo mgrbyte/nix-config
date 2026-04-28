@@ -35,8 +35,8 @@
     "emacs-config": {
       "flake": false,
       "locked": {
-        "lastModified": 1777025744,
-        "narHash": "sha256-ZFP/svDtWj+ybLFIDaR/V+mkrKh+qY5ehKSvlGHDu7M=",
+        "lastModified": 1777390094,
+        "narHash": "sha256-7Vi/MvljMCsPHlgQFnmVsRH9p1T8RKFQz94gpXiTnVs=",
         "path": "/Users/mtr21pqh/github/mgrbyte/emacs.d",
         "type": "path"
       },
@@ -182,11 +182,11 @@
     "nix-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1777291267,
-        "narHash": "sha256-tJ++LPhozu3+wFrf+yCcU7O7MuJdUp+mgKPiFoBp/jM=",
+        "lastModified": 1777377667,
+        "narHash": "sha256-QHJZRfEG0DdIY7/iu9BIPoYXlygFKS4uOuG5nX1rJKA=",
         "ref": "refs/heads/main",
-        "rev": "d490e87612869edfc325c0743a756b5479712b47",
-        "revCount": 20,
+        "rev": "5c6d43a38794ddbf6d04f7508973db7e19794c3a",
+        "revCount": 21,
         "type": "git",
         "url": "ssh://git@github.com/mgrbyte/nix-secrets"
       },
