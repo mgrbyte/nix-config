@@ -30,6 +30,7 @@ in {
     ./packages.nix
     ./shell.nix
     ./git.nix
+    ./ssh.nix
     ./emacs.nix
     ./terminals.nix
     ./tmux.nix

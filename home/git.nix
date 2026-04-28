@@ -1,8 +1,6 @@
 { config, pkgs, lib, name, user, homeDir, ... }:
 
 let
-  isDarwin = pkgs.stdenv.isDarwin;
-  isLinux = pkgs.stdenv.isLinux;
   personalEmail = "mgrbyte@member.fsf.org";
   workEmail = "m.russell@bangor.ac.uk";
 in {
@@ -109,27 +107,6 @@ in {
       };
       "includeIf \"gitdir:${homeDir}/github/huggingface/techiaith/\"" = {
         path = "${homeDir}/.config/git/work.inc";
-      };
-    };
-  };
-
-  programs.ssh = {
-    enable = true;
-    enableDefaultConfig = false;
-    includes = lib.optionals (user == "mtr21pqh") [
-      (if isLinux then "/home/${user}/.ssh/config_work" else "/Users/${user}/.ssh/config_work")
-    ];
-    matchBlocks = {
-      "*" = {
-        sendEnv = [ "LANG" "LC_*" ];
-        hashKnownHosts = true;
-        addKeysToAgent = "yes";
-      };
-      "github.com" = {
-        identitiesOnly = true;
-        identityFile = [
-          (if isLinux then "/home/${user}/.ssh/id_mgrbyte_github" else "/Users/${user}/.ssh/id_mgrbyte_github")
-        ];
       };
     };
   };
