@@ -22,6 +22,48 @@ let
     files = [ "*.el" ];
   };
 
+  # TRAMP 2.8.1.4 from GNU ELPA (nixpkgs has 2.8.1.2, tramp-rpc needs >= 2.8.1.3)
+  tramp-pkg = pkgs.emacsPackages.trivialBuild {
+    pname = "tramp";
+    version = "2.8.1.4";
+    src = pkgs.fetchurl {
+      url = "https://elpa.gnu.org/packages/tramp-2.8.1.4.tar";
+      sha256 = "sha256-PMofWpP8ag0/9z0yuFiz2P379zhKHcDGpw1UAJD8XI4=";
+    };
+    unpackPhase = ''
+      tar xf $src
+      sourceRoot=tramp-2.8.1.4
+    '';
+  };
+
+  # msgpack.el - MessagePack library (dependency of tramp-rpc, not in nixpkgs)
+  msgpack-pkg = pkgs.emacsPackages.trivialBuild {
+    pname = "msgpack";
+    version = "0.1.0";
+    src = pkgs.fetchFromGitHub {
+      owner = "xuchunyang";
+      repo = "msgpack.el";
+      rev = "master";
+      sha256 = "sha256-5pP2uhTvtaLYAuexOXikePLG1UJ7xMW1uMHJfnoqKj0=";
+    };
+  };
+
+  # tramp-rpc - Rust-based TRAMP method with batch operations
+  tramp-rpc-pkg = pkgs.emacsPackages.trivialBuild {
+    pname = "tramp-rpc";
+    version = "0.8.0";
+    src = pkgs.fetchFromGitHub {
+      owner = "ArthurHeymans";
+      repo = "emacs-tramp-rpc";
+      rev = "v0.8.0";
+      sha256 = "sha256-IVzET51xhSQoj6TjfJvtruqyYB9wDOgAKUIWFRXtOYA=";
+    };
+    postUnpack = ''
+      cp $sourceRoot/lisp/*.el $sourceRoot/
+    '';
+    packageRequires = [ msgpack-pkg tramp-pkg ];
+  };
+
   # Build claude-code.el from github (not in nixpkgs)
   claude-code-el-pkg = pkgs.emacsPackages.trivialBuild {
     pname = "claude-code";
@@ -84,6 +126,9 @@ let
     claude-code-el-pkg
     claude-code-ide-pkg
     emacs-mcp-server-pkg
+    tramp-pkg
+    msgpack-pkg
+    tramp-rpc-pkg
     vterm-anti-flicker-filter-pkg
   ] ++ (with epkgs; [
     clojure-mode
