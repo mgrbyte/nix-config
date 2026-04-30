@@ -71,8 +71,8 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "stevemolitor";
       repo = "claude-code.el";
-      rev = "main";
-      sha256 = "sha256-ISlD6q1hceckry1Jd19BX1MfobHJxng5ulX2gq9f644=";
+      rev = "e2d29b05a97fdded88ba7ca0586a5483ca2e3dcb";
+      sha256 = "sha256-AvriQS0mI02N9frOL6xCnezzvp2ID03ZuRiOBrlujsw=";
     };
     packageRequires = with pkgs.emacsPackages; [ inheritenv ];
   };
@@ -84,7 +84,7 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "manzaltu";
       repo = "claude-code-ide.el";
-      rev = "main";
+      rev = "56db02ee386d009ddb8b1482310f1f9beeefb810";
       sha256 = "sha256-qH1QnG5G+0UiH/v0KaS7oSpQZY+BkUMZvrjbx6kyFhg=";
     };
     packageRequires = with pkgs.emacsPackages; [ websocket web-server transient ];
@@ -97,8 +97,8 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "rhblind";
       repo = "emacs-mcp-server";
-      rev = "main";
-      sha256 = "sha256-3a9pXwa8o03Y4kFcHB+CqML7SwIb3+b1qOyOaB1QUL8=";
+      rev = "0eaa43b879d07ddb86fa78638e898722af23fe28";
+      sha256 = "sha256-MskojJVzHxHhMNo04DnNGLBCSX+iqGoRygzaTQOy3BA=";
     };
     postUnpack = ''
       cp $sourceRoot/tools/*.el $sourceRoot/
