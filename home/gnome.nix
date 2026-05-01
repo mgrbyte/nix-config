@@ -1,6 +1,6 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, nixUserChroot ? false, ... }:
 
-lib.mkIf pkgs.stdenv.isLinux {
+lib.mkIf (pkgs.stdenv.isLinux && !nixUserChroot) {
   # Use a proper systemd ssh-agent instead of GCR's ssh component.
   # GCR's ssh-agent intercepts sign requests and calls ensure_key() which
   # spawns a GUI prompt via gcr-ssh-askpass; from a headless context (Emacs

@@ -74,7 +74,7 @@ echo "=== Step 7: Clone nix-config and deploy home-manager ==="
   [ -d nix-config ] || git clone git@github.com:mgrbyte/nix-config.git
   cd nix-config
   git pull --ff-only
-  nix run home-manager -- switch -b backup --flake .#mtr21pqh-x86_64-linux || true
+  nix run home-manager -- switch -b backup --flake .#mtr21pqh-chroot-x86_64-linux || true
 '
 
 echo "=== Step 8: Decrypt secrets ==="

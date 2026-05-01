@@ -1,4 +1,4 @@
-{ config, pkgs, lib, homeDir, nixPath, emacs-config, ... }:
+{ config, pkgs, lib, homeDir, nixPath, emacs-config, nixUserChroot ? false, ... }:
 
 let
   isDarwin = pkgs.stdenv.isDarwin;
@@ -50,8 +50,8 @@ in {
     categories = [ "Development" "TextEditor" "Utility" ];
   };
 
-  # Emacs daemon via systemd (Linux only)
-  systemd.user.services.emacs = lib.mkIf pkgs.stdenv.isLinux {
+  # Emacs daemon via systemd (Linux only, not in nix-user-chroot)
+  systemd.user.services.emacs = lib.mkIf (pkgs.stdenv.isLinux && !nixUserChroot) {
     Unit = {
       Description = "Emacs daemon";
       After = [ "graphical-session.target" ];

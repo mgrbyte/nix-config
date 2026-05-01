@@ -48,10 +48,10 @@
       systems = [ "aarch64-darwin" "x86_64-darwin" "x86_64-linux" "aarch64-linux" ];
       forAllSystems = f: nixpkgs.lib.genAttrs systems f;
 
-      mkHomeConfig = { system, user }: home-manager.lib.homeManagerConfiguration {
+      mkHomeConfig = { system, user, nixUserChroot ? false }: home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.${system};
         extraSpecialArgs = {
-          inherit inputs emacs-config nix-colors user;
+          inherit inputs emacs-config nix-colors user nixUserChroot;
           nix-secrets = inputs.nix-secrets;
           emacs-abyss-theme = inputs.emacs-abyss-theme;
           emacs-tokyo-theme = inputs.emacs-tokyo-theme;
@@ -70,6 +70,7 @@
       homeConfigurations."mtr21pqh-aarch64-darwin" = mkHomeConfig { system = "aarch64-darwin"; user = "mtr21pqh"; };
       homeConfigurations."mtr21pqh-x86_64-darwin" = mkHomeConfig { system = "x86_64-darwin"; user = "mtr21pqh"; };
       homeConfigurations."mtr21pqh-x86_64-linux" = mkHomeConfig { system = "x86_64-linux"; user = "mtr21pqh"; };
+      homeConfigurations."mtr21pqh-chroot-x86_64-linux" = mkHomeConfig { system = "x86_64-linux"; user = "mtr21pqh"; nixUserChroot = true; };
       homeConfigurations."mtr21pqh-aarch64-linux" = mkHomeConfig { system = "aarch64-linux"; user = "mtr21pqh"; };
 
       # homeConfigurations for mgrbyte (personal NixOS)

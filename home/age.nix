@@ -1,6 +1,9 @@
-{ config, pkgs, lib, homeDir, user, nix-secrets, ... }:
+{ config, pkgs, lib, homeDir, user, nix-secrets, nixUserChroot ? false, ... }:
 
 {
+  # Disable home-manager-secrets systemd service in nix-user-chroot
+  # (systemd runs outside the chroot and can't see /nix/store paths)
+  systemd.user.services.home-manager-secrets = lib.mkIf nixUserChroot (lib.mkForce {});
   secrets = {
     # The age identity file used to decrypt secrets
     identityPaths = [ "${homeDir}/.ssh/id_ed25519_agenix" ];
