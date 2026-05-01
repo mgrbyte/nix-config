@@ -83,11 +83,9 @@ echo "=== Step 8: Decrypt secrets ==="
   $decrypt_cmd
 '
 
-echo "=== Step 9: Install entry and remote scripts ==="
+echo "=== Step 9: Install nix-enter script ==="
 cp ~/github/mgrbyte/nix-config/scripts/nix-enter ~/.local/bin/nix-enter
 chmod +x ~/.local/bin/nix-enter
-cp ~/github/mgrbyte/nix-config/scripts/claude-ide-remote ~/.local/bin/claude-ide-remote
-chmod +x ~/.local/bin/claude-ide-remote
 
 echo "=== Step 10: Host shell bootstrap ==="
 if ! grep -q '.local/bin' ~/.zprofile 2>/dev/null; then
