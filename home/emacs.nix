@@ -33,6 +33,7 @@ in {
       StandardErrorPath = "/tmp/emacs-daemon.err";
       EnvironmentVariables = {
         PATH = nixPath;
+        COLORTERM = "truecolor";
         CLAUDE_TIPS_FILE = "${homeDir}/.claude/tips.txt";
         # SSH_AUTH_SOCK inherited from launchd (macOS native ssh-agent)
       };
@@ -64,6 +65,7 @@ in {
       Restart = "on-failure";
       Environment = [
         "PATH=${nixPath}"
+        "COLORTERM=truecolor"
         "CLAUDE_TIPS_FILE=${homeDir}/.claude/tips.txt"
       ];
     };

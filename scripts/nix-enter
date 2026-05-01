@@ -23,6 +23,9 @@ if [ -S /var/run/docker.sock ] && command -v socat &>/dev/null; then
   export DOCKER_HOST="unix:///nix/tmp/docker-proxy.sock"
 fi
 
+# Ensure true colour support for terminal Emacs
+export COLORTERM="truecolor"
+
 exec "$HOME/.local/bin/nix-user-chroot" "$HOME/.nix" bash -lc '
   # 1. Decrypt secrets (always re-run — fast, idempotent)
   decrypt_cmd=$(grep "^ExecStart=" ~/.config/systemd/user/home-manager-secrets.service | sed "s/^ExecStart=//")

@@ -79,6 +79,12 @@ in {
       mods = "Shift"
       chars = "\n"
 
+      # Override macOS Cmd+x to send M-x (emacs execute-extended-command)
+      [[keyboard.bindings]]
+      key = "X"
+      mods = "Command"
+      chars = "\u001bx"
+
       # Override macOS Cmd+w (close window) to send M-w (emacs kill-ring-save)
       [[keyboard.bindings]]
       key = "W"

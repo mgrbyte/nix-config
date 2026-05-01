@@ -42,13 +42,16 @@ in {
         '';
       }
     ];
-    terminal = "screen-256color";
+    terminal = "tmux-256color";
     prefix = "C-t";
     keyMode = "emacs";
     mouse = true;
     escapeTime = 10;
     historyLimit = 50000;
     extraConfig = ''
+      # True colour support
+      set -ga terminal-overrides ",*256col*:Tc,alacritty:Tc"
+
       # Scroll up enters copy mode automatically; prevents escape sequences leaking to shell
       bind -n WheelUpPane if-shell -F -t = "#{mouse_any_flag}" "send-keys -M" "if -Ft= '#{pane_in_mode}' 'send-keys -M' 'copy-mode -e'"
 
