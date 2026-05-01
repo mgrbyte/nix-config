@@ -1,0 +1,31 @@
+#!/bin/bash
+# Enter nix-user-chroot, bootstrap services, launch tmux.
+# Idempotent — safe to run multiple times.
+#
+# This script runs OUTSIDE the chroot on the host. It must be a real file
+# at ~/.local/bin/nix-enter, NOT a symlink to /nix/store/ (which would
+# dangle outside the chroot). The setup script copies it into place.
+#
+# Usage: nix-enter
+
+set -euo pipefail
+
+exec "$HOME/.local/bin/nix-user-chroot" "$HOME/.nix" bash -lc '
+  # 1. Decrypt secrets (always re-run — fast, idempotent)
+  decrypt_cmd=$(grep "^ExecStart=" ~/.config/systemd/user/home-manager-secrets.service | sed "s/^ExecStart=//")
+  if [ -n "$decrypt_cmd" ]; then
+    $decrypt_cmd
+  fi
+
+  # 2. Start ssh-agent with fixed socket (if not already running)
+  export SSH_AUTH_SOCK="$HOME/.ssh/agent.sock"
+  if ! ssh-add -l &>/dev/null 2>&1; then
+    rm -f "$SSH_AUTH_SOCK"
+    eval $(ssh-agent -a "$SSH_AUTH_SOCK") >/dev/null
+    ssh-add ~/.ssh/id_mgrbyte_github 2>/dev/null
+    ssh-add ~/.ssh/id_ed25519_mtr21pqh 2>/dev/null
+  fi
+
+  # 3. Attach or create tmux session
+  exec tmux new-session -A -s main
+'

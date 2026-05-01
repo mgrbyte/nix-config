@@ -1,0 +1,103 @@
+#!/bin/bash
+# Setup nix-user-chroot + Nix + home-manager on a remote Ubuntu 24.04+ server.
+# Idempotent — safe to re-run.
+#
+# Prerequisites:
+#   - ~/.ssh/id_ed25519_agenix and ~/.ssh/id_mgrbyte_github already on server
+#   - sudo access (one-time, for AppArmor profile only)
+#
+# Usage from local Mac:
+#   scp ~/.ssh/id_ed25519_agenix <server>:~/.ssh/
+#   scp ~/.ssh/id_mgrbyte_github <server>:~/.ssh/
+#   ssh <server> 'chmod 600 ~/.ssh/id_ed25519_agenix ~/.ssh/id_mgrbyte_github'
+#   ssh <server> 'bash -s' < scripts/setup-nix-user-chroot-server
+#
+# After setup, run interactively on the server:
+#   source ~/.zprofile
+#   nix-enter
+#   claude login
+
+set -euo pipefail
+
+echo "=== Step 1: AppArmor profile (requires sudo) ==="
+if [ -f /etc/apparmor.d/nix-user-chroot ]; then
+  echo "AppArmor profile already exists, skipping"
+else
+  sudo tee /etc/apparmor.d/nix-user-chroot << APPARMOR
+abi <abi/4.0>,
+include <tunables/global>
+
+profile nix-user-chroot /home/$USER/.local/bin/nix-user-chroot flags=(unconfined) {
+  userns,
+  include if exists <local/nix-user-chroot>
+}
+APPARMOR
+  sudo /etc/init.d/apparmor reload
+fi
+
+echo "=== Step 2: Download nix-user-chroot ==="
+mkdir -p ~/.local/bin ~/.nix
+if [ -x ~/.local/bin/nix-user-chroot ]; then
+  echo "nix-user-chroot already installed, skipping"
+else
+  curl -L https://github.com/nix-community/nix-user-chroot/releases/download/2.1.1/nix-user-chroot-bin-2.1.1-x86_64-unknown-linux-musl > ~/.local/bin/nix-user-chroot
+  chmod +x ~/.local/bin/nix-user-chroot
+fi
+
+echo "=== Step 3: Verify nix-user-chroot works ==="
+~/.local/bin/nix-user-chroot ~/.nix bash -c 'echo "chroot works"'
+
+echo "=== Step 4: Install Nix ==="
+if [ -d ~/.nix/var ]; then
+  echo "Nix already installed, skipping"
+else
+  ~/.local/bin/nix-user-chroot ~/.nix bash -c "curl -L https://nixos.org/nix/install | bash"
+fi
+
+echo "=== Step 5: Configure Nix ==="
+mkdir -p ~/.nix/etc/nix
+if [ -f ~/.nix/etc/nix/nix.conf ]; then
+  echo "nix.conf already exists, skipping"
+else
+  cat > ~/.nix/etc/nix/nix.conf << 'NIXCONF'
+experimental-features = nix-command flakes
+NIXCONF
+fi
+
+echo "=== Step 6: Verify Nix works ==="
+~/.local/bin/nix-user-chroot ~/.nix bash -c '. ~/.nix-profile/etc/profile.d/nix.sh && nix run nixpkgs#hello'
+
+echo "=== Step 7: Clone nix-config and deploy home-manager ==="
+~/.local/bin/nix-user-chroot ~/.nix bash -lc '
+  mkdir -p ~/github/mgrbyte
+  cd ~/github/mgrbyte
+  [ -d nix-config ] || git clone git@github.com:mgrbyte/nix-config.git
+  cd nix-config
+  git pull --ff-only
+  nix run home-manager -- switch -b backup --flake .#mtr21pqh-x86_64-linux || true
+'
+
+echo "=== Step 8: Decrypt secrets ==="
+~/.local/bin/nix-user-chroot ~/.nix bash -lc '
+  decrypt_cmd=$(grep "^ExecStart=" ~/.config/systemd/user/home-manager-secrets.service | sed "s/^ExecStart=//")
+  $decrypt_cmd
+'
+
+echo "=== Step 9: Install nix-enter script ==="
+cp ~/github/mgrbyte/nix-config/scripts/nix-enter ~/.local/bin/nix-enter
+chmod +x ~/.local/bin/nix-enter
+
+echo "=== Step 10: Host shell bootstrap ==="
+if ! grep -q '.local/bin' ~/.zprofile 2>/dev/null; then
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zprofile
+  echo "Added PATH to ~/.zprofile"
+else
+  echo "~/.zprofile already has .local/bin in PATH"
+fi
+
+echo ""
+echo "=== Setup complete ==="
+echo "Next steps (interactive):"
+echo "  source ~/.zprofile"
+echo "  nix-enter"
+echo "  claude login"
