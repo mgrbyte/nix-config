@@ -10,6 +10,19 @@
 
 set -euo pipefail
 
+# Start docker socket proxy if docker is available on the host
+DOCKER_PROXY_SOCK="$HOME/.nix/tmp/docker-proxy.sock"
+mkdir -p "$HOME/.nix/tmp"
+if [ -S /var/run/docker.sock ] && command -v socat &>/dev/null; then
+  if [ ! -S "$DOCKER_PROXY_SOCK" ]; then
+    socat UNIX-LISTEN:"$DOCKER_PROXY_SOCK",fork,mode=666 UNIX-CONNECT:/var/run/docker.sock &
+    SOCAT_PID=$!
+    trap "kill $SOCAT_PID 2>/dev/null; rm -f $DOCKER_PROXY_SOCK" EXIT
+    sleep 0.5
+  fi
+  export DOCKER_HOST="unix:///nix/tmp/docker-proxy.sock"
+fi
+
 exec "$HOME/.local/bin/nix-user-chroot" "$HOME/.nix" bash -lc '
   # 1. Decrypt secrets (always re-run — fast, idempotent)
   decrypt_cmd=$(grep "^ExecStart=" ~/.config/systemd/user/home-manager-secrets.service | sed "s/^ExecStart=//")
