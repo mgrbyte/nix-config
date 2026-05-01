@@ -6,4 +6,4 @@
 #
 # All arguments are passed through to claude-ide-external inside the chroot.
 
-exec ~/.local/bin/nix-user-chroot ~/.nix zsh -lc "claude-ide-external $*"
+exec ~/.local/bin/nix-user-chroot ~/.nix zsh -c '. ~/.nix-profile/etc/profile.d/nix.sh && exec claude-ide-external "$@"' -- "$@"
