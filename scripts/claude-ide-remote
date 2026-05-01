@@ -1,0 +1,9 @@
+#!/bin/bash
+# Launch Claude Code IDE inside nix-user-chroot on a remote server.
+# Called via SSH from the local Emacs mgrbyte-claude-ide-external function.
+#
+# Usage: ssh -R PORT:localhost:PORT host claude-ide-remote [args...]
+#
+# All arguments are passed through to claude-ide-external inside the chroot.
+
+exec ~/.local/bin/nix-user-chroot ~/.nix zsh -lc "claude-ide-external $*"
