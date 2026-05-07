@@ -14,10 +14,12 @@ set -euo pipefail
 DOCKER_PROXY_SOCK="$HOME/.nix/tmp/docker-proxy.sock"
 mkdir -p "$HOME/.nix/tmp"
 if [ -S /var/run/docker.sock ] && command -v socat &>/dev/null; then
+  # Remove stale socket from previous session/reboot
+  if [ -e "$DOCKER_PROXY_SOCK" ] && ! docker -H "unix://$DOCKER_PROXY_SOCK" info &>/dev/null; then
+    rm -f "$DOCKER_PROXY_SOCK"
+  fi
   if [ ! -S "$DOCKER_PROXY_SOCK" ]; then
     socat UNIX-LISTEN:"$DOCKER_PROXY_SOCK",fork,mode=666 UNIX-CONNECT:/var/run/docker.sock &
-    SOCAT_PID=$!
-    trap "kill $SOCAT_PID 2>/dev/null; rm -f $DOCKER_PROXY_SOCK" EXIT
     sleep 0.5
   fi
   export DOCKER_HOST="unix:///nix/tmp/docker-proxy.sock"
