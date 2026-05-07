@@ -5,6 +5,7 @@
 # Usage: claude-ide-external --port PORT --session-id ID --mcp-url URL
 #                            [--working-dir DIR] [--resume] [--continue]
 #                            [--allowed-tools TOOLS] [--extra-flags FLAGS]
+#                            [--remote-prompt PROMPT]
 
 set -euo pipefail
 
@@ -17,6 +18,7 @@ resume=""
 continue_flag=""
 allowed_tools=""
 extra_flags=""
+remote_prompt=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -28,6 +30,7 @@ while [[ $# -gt 0 ]]; do
         --continue) continue_flag="-c"; shift ;;
         --allowed-tools) allowed_tools="$2"; shift 2 ;;
         --extra-flags) extra_flags="$2"; shift 2 ;;
+        --remote-prompt) remote_prompt="$2"; shift 2 ;;
         *) echo "Unknown argument: $1" >&2; exit 1 ;;
     esac
 done
@@ -58,6 +61,7 @@ cmd_args+=(--append-system-prompt "$system_prompt")
 cmd_args+=(--mcp-config "$mcp_config")
 [[ -n "$allowed_tools" ]] && cmd_args+=(--allowedTools $=allowed_tools)
 [[ -n "$extra_flags" ]] && cmd_args+=($=extra_flags)
+[[ -n "$remote_prompt" ]] && cmd_args+=(--append-system-prompt "$remote_prompt")
 
 # Launch Claude with env vars
 export CLAUDE_CODE_SSE_PORT="$port"
