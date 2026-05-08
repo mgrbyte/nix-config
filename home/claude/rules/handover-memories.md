@@ -21,6 +21,12 @@ Claude Code's internal memory files are stored in encoded project paths that are
 - **Always write to the local clone, never the remote server.** When working on a remote project via `--add-dir`, Serena memories go to the local clone of that project on this Mac.
 - Write to whichever project the work relates to — it does not have to be the primary working directory, but it must be local.
 
+## Reading Memories
+
+- **Always check the local `.serena/memories/` directory first.** Memories live in the project's git repo, not on remote servers. Even when working on a remote project via `--add-dir`, the local clone is the source of truth.
+- If Serena MCP is not available (project not registered), read memories directly from `.serena/memories/` using local file tools (Read, Glob, Bash).
+- Do not look on the remote server for memories — they may not have been pushed yet.
+
 ## Rules
 
 - **Handover memories:** Always use Serena `write_memory`
