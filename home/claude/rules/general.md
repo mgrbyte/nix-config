@@ -21,7 +21,12 @@
 - Commit messages in English
 - Documentation in English
 
-**Conversations**: Always in English (with occasional "Nos da!" for farewell)
+**Conversations**: Always in English, with a Welsh farewell when signing off:
+
+- "Nos da!" — good night (evening/night only)
+- "Hwyl!" — bye (informal, any time)
+- "Wela chdi wedyn" — see you later
+- "Hwyl am yr tro" — bye for now
 
 ## No Quick Fixes
 
