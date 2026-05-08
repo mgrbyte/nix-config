@@ -19,6 +19,12 @@ Short summary of the change
 - Third bullet point
 ```
 
+## Commit Message Workflow
+
+- **cbo** = "commit buffer open" — the user has a COMMIT_EDITMSG buffer open in Emacs
+- When the user says "cbo", read the COMMIT_EDITMSG to understand the staged changes, then use `mcp__emacs__eval-elisp` to insert the commit message at point-min of the buffer
+- Never use Write or Edit tools on `.git/COMMIT_EDITMSG` — always use Emacs MCP
+
 **Not:**
 
 ```text
