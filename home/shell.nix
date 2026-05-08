@@ -65,6 +65,12 @@ in
 
     '';
 
+    # Login shell config (.zprofile) - runs after /etc/zprofile's path_helper
+    # which reorders PATH, pushing nix paths behind /usr/bin
+    profileExtra = ''
+      export PATH="${nixPath}"
+    '';
+
     # Interactive shell config (.zshrc)
     initContent = ''
       # Auto-start tmux (consistent tab behaviour across macOS and Linux)
