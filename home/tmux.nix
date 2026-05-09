@@ -21,8 +21,9 @@ in {
           set -g @tokyo-night-tmux_show_datetime 1
           set -g @tokyo-night-tmux_show_path 1
           set -g @tokyo-night-tmux_path_format 'relative'
-          set -g @tokyo-night-tmux_show_music 1
-          set -g @tokyo-night-tmux_show_battery_widget 1
+          set -g @tokyo-night-tmux_show_music 0
+          set -g @tokyo-night-tmux_show_battery_widget 0
+          set -g @tokyo-night-tmux_show_netspeed 0
           set -g @tokyo-night-tmux_show_hostname 1
         '';
       }
