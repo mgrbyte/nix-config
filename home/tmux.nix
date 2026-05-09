@@ -15,7 +15,7 @@ in {
           # Ensure Nix bash 5.x is used by plugin scripts (macOS ships bash 3.2
           # which doesn't support associative arrays needed by tokyo-night-tmux)
           set-environment -g PATH "${config.home.profileDirectory}/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-          set -g @tokyo-night-tmux_theme 'night'
+          set -g @tokyo-night-tmux_theme 'storm'
           set -g @tokyo-night-tmux_date_format 'DMY'
           set -g @tokyo-night-tmux_time_format '24H'
           set -g @tokyo-night-tmux_show_datetime 1
@@ -25,6 +25,8 @@ in {
           set -g @tokyo-night-tmux_show_battery_widget 0
           set -g @tokyo-night-tmux_show_netspeed 0
           set -g @tokyo-night-tmux_show_hostname 1
+          set -g @tokyo-night-tmux_window_id_style 'none'
+          set -g @tokyo-night-tmux_pane_id_style 'hide'
         '';
       }
       {
@@ -39,7 +41,7 @@ in {
         plugin = continuum;
         extraConfig = ''
           set -g @continuum-restore 'on'
-          set -g @continuum-save-interval '5'
+          set -g @continuum-save-interval '1'
         '';
       }
     ];

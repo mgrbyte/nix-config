@@ -20,15 +20,15 @@ in {
       size = 14.0
 
       [font.normal]
-      family = "Hack Nerd Font"
+      family = "Hack Nerd Font Mono"
       style = "Regular"
 
       [font.bold]
-      family = "Hack Nerd Font"
+      family = "Hack Nerd Font Mono"
       style = "Bold"
 
       [font.italic]
-      family = "Hack Nerd Font"
+      family = "Hack Nerd Font Mono"
       style = "Italic"
 
       # Colors from nix-colors (${config.colorScheme.slug})
