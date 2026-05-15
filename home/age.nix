@@ -49,6 +49,10 @@
         source = "${nix-secrets}/init-gitlab-sync-config.el.age";
         symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.emacs.d/lisp/init-gitlab-sync-config.el" ];
       };
+      "id_ed25519_mtr21pqh_falcon" = {
+        source = "${nix-secrets}/id_ed25519_mtr21pqh_falcon.age";
+        symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.ssh/id_ed25519_mtr21pqh_falcon" ];
+      };
       "allowed-signers" = {
         source = "${nix-secrets}/allowed-signers.age";
         symlinks = [ "${homeDir}/.ssh/allowed_signers" ];
@@ -85,6 +89,7 @@
     }
     _regen_pub ${homeDir}/.ssh/id_mgrbyte_github
     ${lib.optionalString (user == "mtr21pqh") "_regen_pub ${homeDir}/.ssh/id_ed25519_mtr21pqh"}
+    ${lib.optionalString (user == "mtr21pqh") "_regen_pub ${homeDir}/.ssh/id_ed25519_mtr21pqh_falcon"}
   '';
 
   # Load SSH keys into agent (and macOS keychain) for git signing
@@ -92,6 +97,7 @@
   home.activation.loadSshKeysToAgent = lib.mkIf pkgs.stdenv.isDarwin (
     lib.hm.dag.entryAfter ["generateSshPubKeys"] ''
       ${lib.optionalString (user == "mtr21pqh") "/usr/bin/ssh-add --apple-use-keychain ${homeDir}/.ssh/id_ed25519_mtr21pqh 2>/dev/null || true"}
+      ${lib.optionalString (user == "mtr21pqh") "/usr/bin/ssh-add --apple-use-keychain ${homeDir}/.ssh/id_ed25519_mtr21pqh_falcon 2>/dev/null || true"}
       /usr/bin/ssh-add --apple-use-keychain ${homeDir}/.ssh/id_mgrbyte_github 2>/dev/null || true
     ''
   );
