@@ -73,6 +73,7 @@ in
         $DRY_RUN_CMD mkdir -p "${homeDir}/.secrets"
         $DRY_RUN_CMD chmod 0700 "${homeDir}/.secrets"
         ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: cfg: ''
+          $DRY_RUN_CMD rm -f "${homeDir}/.secrets/${name}"
           $DRY_RUN_CMD ${pkgs.age}/bin/age -d -i "${homeDir}/.ssh/id_ed25519_agenix" -o "${homeDir}/.secrets/${name}" "${cfg.source}"
           $DRY_RUN_CMD chmod 0400 "${homeDir}/.secrets/${name}"
           ${lib.concatStringsSep "\n" (map (symlinkPath: ''
