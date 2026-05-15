@@ -64,17 +64,23 @@ in
     file = secretFiles;
   };
 
-  # Create symlinks for secrets in nixUserChroot mode
-  # (the home-manager-secrets systemd service is disabled, so symlinks
-  # from ~/.secrets/<name> to their target paths must be created here)
+  # Decrypt and symlink secrets in nixUserChroot mode
+  # (the home-manager-secrets systemd service is disabled because systemd
+  # runs outside the chroot — we must handle both decryption and symlinking)
   home.activation.createSecretSymlinks =
     lib.hm.dag.entryAfter ["writeBoundary"] ''
-      ${lib.optionalString nixUserChroot (lib.concatStringsSep "\n" (lib.concatLists (lib.mapAttrsToList (name: cfg:
-        map (symlinkPath: ''
-          $DRY_RUN_CMD mkdir -p "$(dirname "${symlinkPath}")"
-          $DRY_RUN_CMD ln -sfn "${homeDir}/.secrets/${name}" "${symlinkPath}"
-        '') cfg.symlinks
-      ) secretFiles)))}
+      ${lib.optionalString nixUserChroot ''
+        $DRY_RUN_CMD mkdir -p "${homeDir}/.secrets"
+        $DRY_RUN_CMD chmod 0700 "${homeDir}/.secrets"
+        ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: cfg: ''
+          $DRY_RUN_CMD ${pkgs.age}/bin/age -d -i "${homeDir}/.ssh/id_ed25519_agenix" -o "${homeDir}/.secrets/${name}" "${cfg.source}"
+          $DRY_RUN_CMD chmod 0400 "${homeDir}/.secrets/${name}"
+          ${lib.concatStringsSep "\n" (map (symlinkPath: ''
+            $DRY_RUN_CMD mkdir -p "$(dirname "${symlinkPath}")"
+            $DRY_RUN_CMD ln -sfn "${homeDir}/.secrets/${name}" "${symlinkPath}"
+          '') cfg.symlinks)}
+        '') secretFiles)}
+      ''}
     '';
 
   # Clojure deps.edn - development aliases and tools
