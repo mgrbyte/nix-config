@@ -1,0 +1,8 @@
+#!/bin/bash
+# Deploy host-level scripts to a remote server.
+# Usage: deploy-server <hostname>
+set -euo pipefail
+
+server="${1:?Usage: deploy-server <hostname>}"
+
+scp scripts/nix-enter "$server:~/.local/bin/nix-enter"

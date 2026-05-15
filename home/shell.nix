@@ -10,6 +10,9 @@ in
     dotDir = "${config.xdg.configHome}/zsh";
     autocd = true;
     enableCompletion = true;
+    completionInit = if nixUserChroot
+      then "autoload -U compinit && compinit -u"
+      else "autoload -U compinit && compinit";
     cdpath = [ "~/github" "~/gitlab" ];
 
     # History settings (declarative - generates setopt commands)
