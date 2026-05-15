@@ -44,6 +44,10 @@ exec "$HOME/.local/bin/nix-user-chroot" "$HOME/.nix" bash -lc '
     ssh-add ~/.ssh/id_ed25519_mtr21pqh 2>/dev/null
   fi
 
-  # 3. Attach or create tmux session
-  exec tmux new-session -A -s main
+  # 3. Attach or create tmux session (skip if SSH — avoid nesting with local tmux)
+  if [[ -n "$SSH_CONNECTION" ]]; then
+    exec zsh -l
+  else
+    exec tmux new-session -A -s main
+  fi
 '

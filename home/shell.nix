@@ -74,7 +74,7 @@ in
     # Interactive shell config (.zshrc)
     initContent = ''
       # Auto-start tmux (consistent tab behaviour across macOS and Linux)
-      if [[ -z "$TMUX" && -z "$EMACS" && -z "$VIM" ]]; then
+      if [[ -z "$TMUX" && -z "$SSH_CONNECTION" && -z "$EMACS" && -z "$VIM" ]]; then
         tmux attach-session -t default 2>/dev/null || tmux new-session -s default
       fi
       # Don't suggest commands that start with space (security: space-prefixed commands are private)
@@ -117,7 +117,9 @@ in
       ${lib.optionalString (user == "mtr21pqh") ''
       # Load work environment (API keys)
       if [[ -e "$HOME/.work.env" ]]; then
+        set -a
         source "$HOME/.work.env"
+        set +a
       fi
       ''}
 
