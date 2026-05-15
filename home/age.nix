@@ -1,9 +1,58 @@
 { config, pkgs, lib, homeDir, user, nix-secrets, nixUserChroot ? false, ... }:
 
+let
+  secretFiles = {
+    "id_mgrbyte_github" = {
+      source = "${nix-secrets}/id_mgrbyte_github.age";
+      symlinks = [ "${homeDir}/.ssh/id_mgrbyte_github" ];
+    };
+    "id_ed25519_mtr21pqh" = {
+      source = "${nix-secrets}/id_ed25519_mtr21pqh.age";
+      symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.ssh/id_ed25519_mtr21pqh" ];
+    };
+    "ssh-config-work" = {
+      source = "${nix-secrets}/ssh-config-work.age";
+      symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.ssh/config_work" ];
+    };
+    "huggingface-token" = {
+      source = "${nix-secrets}/huggingface-token.age";
+      symlinks = [ "${homeDir}/.cache/huggingface/token" ];
+    };
+    "work-env" = {
+      source = "${nix-secrets}/work.env.age";
+      symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.work.env" ];
+    };
+    "uv-config" = {
+      source = "${nix-secrets}/uv.toml.age";
+      symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.config/uv/uv.toml" ];
+    };
+    "work.netrc" = {
+      source = "${nix-secrets}/work.netrc.age";
+      symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.netrc" ];
+    };
+    "personal.netrc" = {
+      source = "${nix-secrets}/personal.netrc.age";
+      symlinks = lib.optionals (user == "mgrbyte") [ "${homeDir}/.netrc" ];
+    };
+    "init-gitlab-sync-config" = {
+      source = "${nix-secrets}/init-gitlab-sync-config.el.age";
+      symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.emacs.d/lisp/init-gitlab-sync-config.el" ];
+    };
+    "id_ed25519_mtr21pqh_falcon" = {
+      source = "${nix-secrets}/id_ed25519_mtr21pqh_falcon.age";
+      symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.ssh/id_ed25519_mtr21pqh_falcon" ];
+    };
+    "allowed-signers" = {
+      source = "${nix-secrets}/allowed-signers.age";
+      symlinks = [ "${homeDir}/.ssh/allowed_signers" ];
+    };
+  };
+in
 {
   # Disable home-manager-secrets systemd service in nix-user-chroot
   # (systemd runs outside the chroot and can't see /nix/store paths)
   systemd.user.services.home-manager-secrets = lib.mkIf nixUserChroot (lib.mkForce {});
+
   secrets = {
     # The age identity file used to decrypt secrets
     identityPaths = [ "${homeDir}/.ssh/id_ed25519_agenix" ];
@@ -12,53 +61,21 @@
     mount = "${homeDir}/.secrets";
 
     # Define secrets from nix-secrets repo
-    file = {
-      "id_mgrbyte_github" = {
-        source = "${nix-secrets}/id_mgrbyte_github.age";
-        symlinks = [ "${homeDir}/.ssh/id_mgrbyte_github" ];
-      };
-      "id_ed25519_mtr21pqh" = {
-        source = "${nix-secrets}/id_ed25519_mtr21pqh.age";
-        symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.ssh/id_ed25519_mtr21pqh" ];
-      };
-      "ssh-config-work" = {
-        source = "${nix-secrets}/ssh-config-work.age";
-        symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.ssh/config_work" ];
-      };
-      "huggingface-token" = {
-        source = "${nix-secrets}/huggingface-token.age";
-        symlinks = [ "${homeDir}/.cache/huggingface/token" ];
-      };
-      "work-env" = {
-        source = "${nix-secrets}/work.env.age";
-        symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.work.env" ];
-      };
-      "uv-config" = {
-        source = "${nix-secrets}/uv.toml.age";
-        symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.config/uv/uv.toml" ];
-      };
-      "work.netrc" = {
-        source = "${nix-secrets}/work.netrc.age";
-        symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.netrc" ];
-      };
-      "personal.netrc" = {
-        source = "${nix-secrets}/personal.netrc.age";
-        symlinks = lib.optionals (user == "mgrbyte") [ "${homeDir}/.netrc" ];
-      };
-      "init-gitlab-sync-config" = {
-        source = "${nix-secrets}/init-gitlab-sync-config.el.age";
-        symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.emacs.d/lisp/init-gitlab-sync-config.el" ];
-      };
-      "id_ed25519_mtr21pqh_falcon" = {
-        source = "${nix-secrets}/id_ed25519_mtr21pqh_falcon.age";
-        symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.ssh/id_ed25519_mtr21pqh_falcon" ];
-      };
-      "allowed-signers" = {
-        source = "${nix-secrets}/allowed-signers.age";
-        symlinks = [ "${homeDir}/.ssh/allowed_signers" ];
-      };
-    };
+    file = secretFiles;
   };
+
+  # Create symlinks for secrets in nixUserChroot mode
+  # (the home-manager-secrets systemd service is disabled, so symlinks
+  # from ~/.secrets/<name> to their target paths must be created here)
+  home.activation.createSecretSymlinks =
+    lib.hm.dag.entryAfter ["writeBoundary"] ''
+      ${lib.optionalString nixUserChroot (lib.concatStringsSep "\n" (lib.concatLists (lib.mapAttrsToList (name: cfg:
+        map (symlinkPath: ''
+          $DRY_RUN_CMD mkdir -p "$(dirname "${symlinkPath}")"
+          $DRY_RUN_CMD ln -sfn "${homeDir}/.secrets/${name}" "${symlinkPath}"
+        '') cfg.symlinks
+      ) secretFiles)))}
+    '';
 
   # Clojure deps.edn - development aliases and tools
   home.file.".clojure/deps.edn".source = ../config/deps.edn;
@@ -73,7 +90,7 @@
   # Compares a hash of the private key content to detect actual changes
   # (agenix always touches the file, so mtime comparison is unreliable).
   # Only prompts for passphrase on first run or after secret rotation.
-  home.activation.generateSshPubKeys = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  home.activation.generateSshPubKeys = lib.hm.dag.entryAfter (["writeBoundary"] ++ lib.optional nixUserChroot "createSecretSymlinks") ''
     _regen_pub() {
       local priv="$1"
       local pub="$priv.pub"
