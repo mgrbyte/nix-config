@@ -12,7 +12,7 @@ let
     };
     "ssh-config-work" = {
       source = "${nix-secrets}/ssh-config-work.age";
-      symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.ssh/config_work" ];
+      symlinks = [];  # composeSshConfig reads directly from ~/.secrets/
     };
     "huggingface-token" = {
       source = "${nix-secrets}/huggingface-token.age";
