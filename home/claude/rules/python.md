@@ -14,6 +14,7 @@ paths:
 - Follow PEP8 and Python conventions
 - Write methods and functions without introducing blank lines unless the logic is particularly complex
 - Avoid inline imports unless strictly required (resolving circular imports as a very last resort)
+- Use relative imports (`from .module import`, `from . import`) for intra-package imports within `src/` code
 - NEVER add blank lines in function or method definitions, UNLESS the code is sufficiently complex to warrant doing so.
 - DO NOT add inline `# type: ignore` to suppress typing errors UNLESS it's the only option/last resort.
 

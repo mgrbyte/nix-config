@@ -8,6 +8,8 @@
 - No emojis (unless addressing a rendering bug for a specific character)
 - No file system paths
 - No personal identifiable information
+- No internal server/machine names, hostnames, or work-specific infrastructure details
+- Before writing a commit message, check `git remote -v` — if the remote is a personal repo (e.g. github.com/mgrbyte), ensure the message contains no work-specific information (server names, internal project names, client names, contract details)
 
 Example:
 

@@ -42,6 +42,10 @@ Commit the fix separately from the current work, but do not defer it.
 
 Never suggest `git commit --amend` for commits that have already been pushed. Always create a new commit instead. Force pushing rewrites shared history and disrupts the workflow, even when "safe".
 
+## Remote Command Visibility
+
+Always paste the full output of every `remoteExec` command into your text response. No exceptions. The user cannot see MCP tool results in their UI — only your text output is visible to them. After every `remoteExec` call, copy the output verbatim into a code block in your response.
+
 ## Plan File Management
 
 - **Never overwrite or replace** existing plan files in `~/.claude/plans/`. Always create a new file for a new plan.
