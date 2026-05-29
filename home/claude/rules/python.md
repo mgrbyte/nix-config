@@ -17,6 +17,7 @@ paths:
 - Use relative imports (`from .module import`, `from . import`) for intra-package imports within `src/` code
 - NEVER add blank lines in function or method definitions, UNLESS the code is sufficiently complex to warrant doing so.
 - DO NOT add inline `# type: ignore` to suppress typing errors UNLESS it's the only option/last resort.
+- Separate module level constants with blank lines.
 
 ## Modern Python (3.11+)
 

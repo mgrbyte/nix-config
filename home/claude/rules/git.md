@@ -35,3 +35,9 @@ Short summary of the change
   - Indented bullet (wrong)
   - Another indented bullet (wrong)
 ```
+
+## No Mutating Git via Remote MCP
+
+**NEVER** run mutating git commands (`git add`, `git commit`, `git push`, `git reset`, `git checkout`, `git rebase`, `git merge`, `git stash`, `git tag`, `git branch -d/-D`) via `remoteExec` or any other MCP tool. This bypasses the user's local hooks that gate git operations.
+
+Instead: print the exact commands for the user to run themselves. This applies even when the commit content has been reviewed and approved — the user controls when git state changes.
