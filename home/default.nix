@@ -69,6 +69,11 @@ in {
     executable = true;
   };
 
+  # Enroot needs to know the Docker socket proxy path inside nix-user-chroot
+  xdg.configFile."enroot/.env" = lib.mkIf nixUserChroot {
+    text = "ENROOT_DOCKER_HOST=unix:///nix/tmp/docker-proxy.sock\n";
+  };
+
   nix = {
     package = pkgs.nix;
     settings = {
