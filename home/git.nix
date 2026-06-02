@@ -98,17 +98,22 @@ in {
       gpg.ssh.allowedSignersFile = "${homeDir}/.ssh/allowed_signers";
       pull.rebase = true;
       rebase.autoStash = true;
-      # Work directories override email and signing key; all other paths use personal defaults above
-      "includeIf \"gitdir:${homeDir}/gitlab/\"" = {
-        path = "${homeDir}/.config/git/work.inc";
-      };
-      "includeIf \"gitdir:${homeDir}/github/techiaith/\"" = {
-        path = "${homeDir}/.config/git/work.inc";
-      };
-      "includeIf \"gitdir:${homeDir}/github/huggingface/techiaith/\"" = {
-        path = "${homeDir}/.config/git/work.inc";
-      };
     };
+    # Work directories override email and signing key; placed after [user] so includes take precedence
+    includes = [
+      {
+        condition = "gitdir:${homeDir}/gitlab/";
+        path = "${homeDir}/.config/git/work.inc";
+      }
+      {
+        condition = "gitdir:${homeDir}/github/techiaith/";
+        path = "${homeDir}/.config/git/work.inc";
+      }
+      {
+        condition = "gitdir:${homeDir}/github/huggingface/techiaith/";
+        path = "${homeDir}/.config/git/work.inc";
+      }
+    ];
   };
 
   # Git config include for work directories (overrides global personal defaults)
