@@ -14,7 +14,8 @@ Claude Code's internal memory files are stored in encoded project paths that are
 
 - **Never activate a Serena project in a non-git-repo directory.** Before activating, verify the directory is a git repo root (contains `.git/`). If it doesn't, find the correct git repo subdirectory.
 - **The correct project is the git repo being worked on**, not a parent umbrella or monorepo directory. For example, activate at `parent-dir/actual-git-repo/`, not at `parent-dir/`.
-- **Verify before writing:** Check that the active Serena project path matches the git repo root of the project being worked on before writing any memory.
+- **Always activate before writing:** Call `mcp__serena__activate_project` with the project name (from `.serena/project.yml` `project_name` field) before any `write_memory` or `edit_memory` call. Do not assume the project is already active.
+- **Verify after activating:** Check that the active Serena project path matches the git repo root of the project being worked on before writing any memory.
 
 ## Remote Projects
 
