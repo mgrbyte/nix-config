@@ -73,6 +73,11 @@ in {
       [selection]
       save_to_clipboard = true
 
+      # Disable terminal bell (prevents macOS dock bouncing)
+      [bell]
+      animation = "Linear"
+      duration = 0
+
       # Keyboard bindings
       [[keyboard.bindings]]
       key = "Return"
