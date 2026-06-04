@@ -55,6 +55,9 @@ in {
       # True colour support
       set -ga terminal-overrides ",*256col*:Tc,alacritty:Tc"
 
+      # Silence bells — prevents Alacritty dock bouncing on macOS
+      set -g bell-action none
+
       # Scroll up enters copy mode automatically; prevents escape sequences leaking to shell
       bind -n WheelUpPane if-shell -F -t = "#{mouse_any_flag}" "send-keys -M" "if -Ft= '#{pane_in_mode}' 'send-keys -M' 'copy-mode -e'"
 
