@@ -6,31 +6,41 @@ Originates from Chris McDonough's Pyramid project testing guidelines
 (<https://pylonsproject.org/community-unit-testing-guidelines.html>),
 adopted with snake_case naming (never camelCase).
 
-- **call_fut** — call function under test (deferred import of the function)
-- **call_mut** — call module under test
+- **call_fut** — call function under test
+- **call_mut** — call method under test
 - **call_cmd** — call command under test (for typer CLI commands)
 
-Defer imports to test execution time. This prevents import failures from blocking
-test discovery and provides a single point of change if the import path moves.
+`call_fut`/`call_mut` must use `self`, never `@staticmethod`.
 
-```python
-class TestMyFunction:
-    @staticmethod
-    def call_fut(*args, **kwargs):
-        from mypackage.module import my_function
-        return my_function(*args, **kwargs)
+Import the module under test at the top of the file, not inside
+`call_fut`/`call_mut`. Prefer `from package.subpackage import module`
+so call sites read as `module.function()` / `module.Class()`.
 
-    def test_returns_expected_value(self):
-        result = self.call_fut("input")
-        assert result == "expected"
-```
+All test methods and `call_fut`/`call_mut` must have type annotations
+(argument types + return type). Test methods return `-> None`.
 
 ## Key Principles
 
-- One test class per function/method under test
+- One test class per function/method under test, or per logical group
+- Use inheritance with a `_Base` class to share `call_fut`/`call_mut` across
+  related test classes (e.g. one subclass per noise rule, all sharing the same `call_fut`)
 - Each test method exercises one set of preconditions
 - Minimise shared state — use helpers returning local variables, not `self` attributes
 - Descriptive test method names that clarify intent
+- No inline comments as section separators — use subclasses named accordingly
+- No unused imports (e.g. don't import `pytest` unless using fixtures/parametrize)
+
+## Exemplar
+
+`techiaith-nemo-curator/tests/unit/techiaith/nemo_curator/text/stages/test_normalise.py`
+demonstrates the approved style:
+
+- Module imported at top: `from techiaith.nemo_curator.text.stages import normalise`
+- `_NormaliseSentenceBase` with typed `call_fut` shared by 6 subclasses
+- `TestNormaliseStageProcess` with typed `call_mut` returning `DocumentBatch`
+- All methods have `-> None` annotations
+- Constants imported from the module under test for assertions
+- No inline section comments — class names describe the group
 
 ## Test Directory Convention
 
