@@ -52,6 +52,11 @@ in {
     escapeTime = 10;
     historyLimit = 50000;
     extraConfig = ''
+      # Ensure macOS SSH agent socket is in tmux global environment
+      # (launchd sets SSH_AUTH_SOCK for login shells but tmux server may
+      # start before a login shell runs; resolve it dynamically here)
+      run-shell "/bin/zsh -l -c 'tmux set-environment -g SSH_AUTH_SOCK \$SSH_AUTH_SOCK'"
+
       # True colour support
       set -ga terminal-overrides ",*256col*:Tc,alacritty:Tc"
 
