@@ -111,10 +111,12 @@ in
       # Treat path segments as separate words
       WORDCHARS=''${WORDCHARS/\//}
 
-      # SSH key management: load keys into agent from OS keychain
+      # SSH key management: store and load keys via macOS Keychain
+      # --apple-use-keychain stores passphrases on first use, loads on subsequent boots
+      # Must use /usr/bin/ssh-add (Apple's), not Nix ssh-add (no keychain support)
       # Linux: GNOME keyring daemon acts as SSH agent and handles key caching
       ${lib.optionalString pkgs.stdenv.isDarwin ''
-      /usr/bin/ssh-add --apple-load-keychain 2>/dev/null
+      /usr/bin/ssh-add --apple-use-keychain 2>/dev/null
       ''}
 
       ${lib.optionalString (user == "mtr21pqh") ''
