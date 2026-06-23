@@ -7,22 +7,18 @@ in {
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
-    matchBlocks = {
+    settings = {
       "*" = {
-        sendEnv = [ "LANG" "LC_*" ];
-        hashKnownHosts = true;
-        addKeysToAgent = "yes";
-        extraOptions = {
-          ControlMaster = "auto";
-          ControlPath = "~/.ssh/sockets/%r@%h-%p.%C";
-          ControlPersist = "600";
-        };
+        SendEnv = "LANG LC_*";
+        HashKnownHosts = true;
+        AddKeysToAgent = "yes";
+        ControlMaster = "auto";
+        ControlPath = "~/.ssh/sockets/%r@%h-%p.%C";
+        ControlPersist = "600";
       };
       "github.com" = {
-        identitiesOnly = true;
-        identityFile = [
-          (if isLinux then "/home/${user}/.ssh/id_mgrbyte_github" else "/Users/${user}/.ssh/id_mgrbyte_github")
-        ];
+        IdentitiesOnly = true;
+        IdentityFile = if isLinux then "/home/${user}/.ssh/id_mgrbyte_github" else "/Users/${user}/.ssh/id_mgrbyte_github";
       };
     };
   };
