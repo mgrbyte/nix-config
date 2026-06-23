@@ -92,6 +92,55 @@ in
       # Emacs helper
       e() { emacsclient -t "$@"; }
 
+      # Recolour the Alacritty window while SSH'd into a configured host, so
+      # remote sessions look distinctly different. Driven locally via Alacritty
+      # IPC (bypasses tmux); the window resets on disconnect. Self-disables when
+      # no live Alacritty is found (e.g. on remote hosts).
+      #
+      # The live socket is derived from the running Alacritty PID, not from
+      # $ALACRITTY_SOCKET/$ALACRITTY_WINDOW_ID: tmux caches those at server-start
+      # and they go stale after an Alacritty restart (dead socket files linger),
+      # so trusting them silently no-ops. -w -1 targets all windows of the live
+      # instance, sidestepping the equally-stale cached window id.
+      _ssh_host_in_config() {
+        local _kw rest pat
+        while read -r _kw rest; do
+          [[ "''${_kw:l}" == host ]] || continue
+          for pat in ''${(z)rest}; do
+            [[ "$pat" == "*" || "$pat" == "!"* ]] && continue
+            [[ "$1" == ''${~pat} ]] && return 0
+          done
+        done < "''${HOME}/.ssh/config"
+        return 1
+      }
+
+      _alacritty_live_socket() {
+        local pid sock
+        for pid in ''${(f)"$(pgrep -x alacritty 2>/dev/null)"}; do
+          sock="''${TMPDIR:-/tmp}/Alacritty-$pid.sock"
+          [[ -S "$sock" ]] && { print -r -- "$sock"; return 0; }
+        done
+        return 1
+      }
+
+      ssh() {
+        local sock
+        if ! command -v alacritty >/dev/null 2>&1 || ! sock=$(_alacritty_live_socket); then
+          command ssh "$@"; return
+        fi
+        local dest
+        dest=$(command ssh -G "$@" 2>/dev/null | awk '$1=="host"{print $2; exit}')
+        if [[ -z "$dest" ]] || ! _ssh_host_in_config "$dest"; then
+          command ssh "$@"; return
+        fi
+        ALACRITTY_SOCKET="$sock" alacritty msg config -w -1 'colors.primary.background="#102a2e"' 2>/dev/null
+        {
+          command ssh "$@"
+        } always {
+          ALACRITTY_SOCKET="$sock" alacritty msg config -w -1 --reset 2>/dev/null
+        }
+      }
+
       # Home Manager emacs update functions
       hm-emacs-update() {
         cd ${homeDir}/github/mgrbyte/nix-config || return
