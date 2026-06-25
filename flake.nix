@@ -28,6 +28,13 @@
       url = "github:atahanyorganci/nix-casks";
     };
 
+    # Tracks the latest Claude Code release from npm (hourly), decoupled from
+    # the nixpkgs release cadence. Deliberately NOT following nixpkgs so the
+    # prebuilt binaries from claude-code.cachix.org stay cache-hits.
+    claude-code = {
+      url = "github:sadjow/claude-code-nix";
+    };
+
     nix-colors = {
       url = "github:Misterio77/nix-colors";
     };
@@ -49,7 +56,11 @@
       forAllSystems = f: nixpkgs.lib.genAttrs systems f;
 
       mkHomeConfig = { system, user, nixUserChroot ? false }: home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+          overlays = [ inputs.claude-code.overlays.default ];
+        };
         extraSpecialArgs = {
           inherit inputs emacs-config nix-colors user nixUserChroot;
           nix-secrets = inputs.nix-secrets;

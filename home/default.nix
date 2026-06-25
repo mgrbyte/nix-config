@@ -53,7 +53,6 @@ in {
   colorScheme = nix-colors.colorSchemes.tokyo-night-terminal-dark;
 
   programs.home-manager.enable = true;
-  nixpkgs.config.allowUnfree = true;
 
   # Ensure XDG_DATA_DIRS includes HM profile paths for GNOME app discovery
   targets.genericLinux.enable = isLinux;
@@ -79,6 +78,10 @@ in {
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
       warn-dirty = false;
+      extra-substituters = [ "https://claude-code.cachix.org" ];
+      extra-trusted-public-keys = [
+        "claude-code.cachix.org-1:YeXf2aNu7UTX8Vwrze0za1WEDS+4DuI2kVeWEE4fsRk="
+      ];
     };
   };
 }

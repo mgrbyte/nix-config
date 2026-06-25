@@ -92,12 +92,18 @@ in
       # Emacs helper
       e() { emacsclient -t "$@"; }
 
-      # Recolour the Alacritty window while SSH'd into a configured host, so
-      # remote sessions look distinctly different. Driven locally via Alacritty
-      # IPC (bypasses tmux); the window resets on disconnect. Self-disables when
-      # no live Alacritty is found (e.g. on remote hosts).
+      # Recolour the terminal while SSH'd into a configured host, so remote
+      # sessions look distinctly different. Two modes:
       #
-      # The live socket is derived from the running Alacritty PID, not from
+      #  - Inside tmux: set the current tmux window's `window-style` background.
+      #    This is per-tmux-window, so switching to a local window (C-n/C-p)
+      #    shows its own colour while the remote window stays themed.
+      #  - Outside tmux: recolour the whole Alacritty window via IPC.
+      #
+      # Alacritty IPC alone can't do this: it colours the entire OS window, and
+      # all tmux windows share one OS window, so they'd all change together.
+      #
+      # The IPC live socket is derived from the running Alacritty PID, not from
       # $ALACRITTY_SOCKET/$ALACRITTY_WINDOW_ID: tmux caches those at server-start
       # and they go stale after an Alacritty restart (dead socket files linger),
       # so trusting them silently no-ops. -w -1 targets all windows of the live
@@ -124,21 +130,28 @@ in
       }
 
       ssh() {
-        local sock
-        if ! command -v alacritty >/dev/null 2>&1 || ! sock=$(_alacritty_live_socket); then
-          command ssh "$@"; return
-        fi
-        local dest
+        local bg="#102a2e" dest sock
         dest=$(command ssh -G "$@" 2>/dev/null | awk '$1=="host"{print $2; exit}')
         if [[ -z "$dest" ]] || ! _ssh_host_in_config "$dest"; then
           command ssh "$@"; return
         fi
-        ALACRITTY_SOCKET="$sock" alacritty msg config -w -1 'colors.primary.background="#102a2e"' 2>/dev/null
-        {
+        if [[ -n "$TMUX" ]]; then
+          tmux set-window-option window-style "bg=$bg" 2>/dev/null
+          {
+            command ssh "$@"
+          } always {
+            tmux set-window-option -u window-style 2>/dev/null
+          }
+        elif command -v alacritty >/dev/null 2>&1 && sock=$(_alacritty_live_socket); then
+          ALACRITTY_SOCKET="$sock" alacritty msg config -w -1 "colors.primary.background=\"$bg\"" 2>/dev/null
+          {
+            command ssh "$@"
+          } always {
+            ALACRITTY_SOCKET="$sock" alacritty msg config -w -1 --reset 2>/dev/null
+          }
+        else
           command ssh "$@"
-        } always {
-          ALACRITTY_SOCKET="$sock" alacritty msg config -w -1 --reset 2>/dev/null
-        }
+        fi
       }
 
       # Home Manager emacs update functions
