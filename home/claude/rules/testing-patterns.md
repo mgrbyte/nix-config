@@ -22,8 +22,16 @@ All test methods and `call_fut`/`call_mut` must have type annotations
 ## Key Principles
 
 - One test class per function/method under test, or per logical group
-- Use inheritance with a `_Base` class to share `call_fut`/`call_mut` across
-  related test classes (e.g. one subclass per noise rule, all sharing the same `call_fut`)
+- **Avoid leading underscores in test code** — not on classes, methods, or
+  module-level helpers (no `_Base`, no `_make_one`, no `_write_artifact`); marking
+  test code private is normally unnecessary. Sole exception: a symbol in a *shared*
+  test module (e.g. `conftest`) that's deliberately module-private (relies on local
+  state / not for use outside that module) — the only valid leading `_` in `tests/`.
+- Share `call_fut`/`call_mut` and factories (e.g. `make_one`) across related test
+  classes via a base class. To keep the base from being collected by pytest, name it
+  with a `Test` *suffix* (e.g. `SitemapDownloaderTest` — doesn't match the `Test*`
+  collection *prefix*) or, for a mixin of shared assertions, a descriptive name like
+  `FoobarCommonChecks`. Real test classes keep the `Test` prefix.
 - Each test method exercises one set of preconditions
 - Minimise shared state — use helpers returning local variables, not `self` attributes
 - Descriptive test method names that clarify intent
@@ -32,15 +40,34 @@ All test methods and `call_fut`/`call_mut` must have type annotations
 
 ## Exemplar
 
-`techiaith-nemo-curator/tests/unit/techiaith/nemo_curator/text/stages/test_normalise.py`
-demonstrates the approved style:
+A self-contained illustration of the approved style — kept made-up on purpose so it
+can never drift out of sync with live code:
 
-- Module imported at top: `from techiaith.nemo_curator.text.stages import normalise`
-- `_NormaliseSentenceBase` with typed `call_fut` shared by 6 subclasses
-- `TestNormaliseStageProcess` with typed `call_mut` returning `DocumentBatch`
-- All methods have `-> None` annotations
-- Constants imported from the module under test for assertions
-- No inline section comments — class names describe the group
+```python
+from mypackage import widget
+
+
+class WidgetTest:  # `Test` suffix → pytest skips it; no leading underscore; shared helpers live here
+    def make_one(self, **kwargs) -> widget.Widget:
+        return widget.Widget(**kwargs)
+
+
+class TestResize(WidgetTest):
+    def call_mut(self, inst: widget.Widget, factor: float) -> widget.Widget:
+        return inst.resize(factor)
+
+    def test_doubles_width(self) -> None:
+        result = self.call_mut(self.make_one(width=2), factor=2.0)
+        assert result.width == 4
+```
+
+- module under test imported at the top (`from mypackage import widget`)
+- shared base named with a `Test` *suffix* (`WidgetTest`) — no leading underscore, not collected
+- one `Test*`-prefixed class per method/function under test, with a typed `call_mut`/`call_fut`
+- every method annotated (`-> None` on test methods)
+
+If you ever cite a *real* file instead, pin it to a git SHA (`path/to/test_foo.py @ <sha>`):
+an unpinned reference to live code drifts and later reads as "doesn't exist, must be made up."
 
 ## Test Directory Convention
 
