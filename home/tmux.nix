@@ -57,6 +57,12 @@ in {
       # start before a login shell runs; resolve it dynamically here)
       run-shell "/bin/zsh -l -c 'tmux set-environment -g SSH_AUTH_SOCK \$SSH_AUTH_SOCK'"
 
+      # Disable focus reporting (xterm mode ?1004): the `sensible` plugin turns
+      # it on, which over plain ssh leaks focus-out/in events (^[[O / ^[[I) into
+      # the remote shell as echoed input. This must come after the plugin
+      # run-shell lines (home-manager emits extraConfig last), so it wins.
+      set -g focus-events off
+
       # True colour support
       set -ga terminal-overrides ",*256col*:Tc,alacritty:Tc"
 
