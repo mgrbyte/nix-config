@@ -79,3 +79,21 @@ local configWatcher = hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", 
   hs.reload()
 end)
 configWatcher:start()
+
+-- Keyboard window focus. Focusing via the keyboard (not a mouse click) avoids
+-- the click passing through into the focused TUI, which could land on a menu
+-- option (e.g. accidentally selecting "Decline" on a Claude Code prompt).
+-- These chords include Cmd, so plain Ctrl-a / Ctrl-e still reach tmux/Emacs.
+local function focusEmacs()
+  for _, app in ipairs(hs.application.runningApplications()) do
+    if app:name() == "emacs" or app:name() == "Emacsclient" then
+      app:activate(true)
+      return
+    end
+  end
+end
+
+hs.hotkey.bind({ "ctrl", "cmd" }, "a", function()
+  hs.application.launchOrFocusByBundleID("org.alacritty")
+end)
+hs.hotkey.bind({ "ctrl", "cmd" }, "e", focusEmacs)

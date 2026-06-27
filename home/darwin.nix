@@ -17,24 +17,6 @@ in {
     source = ../config/hammerspoon/init.lua;
   };
 
-  # JankyBorders: draws a coloured border around the focused window across all
-  # apps, so it's obvious at a glance which window has focus (macOS only changes
-  # the top-left traffic lights otherwise). Contrasting colour so focus reads
-  # instantly against the teal SSH background. Tweak active_color/width to taste.
-  launchd.agents.borders = lib.mkIf isDarwin {
-    enable = true;
-    config = {
-      ProgramArguments = [
-        "${pkgs.jankyborders}/bin/borders"
-        "active_color=0xffff9e64"
-        "inactive_color=0x00000000"
-        "width=6.0"
-      ];
-      RunAtLoad = true;
-      KeepAlive = true;
-    };
-  };
-
   # Create Spotlight-indexable aliases for nix apps in ~/Applications
   # Using ~/Applications avoids JAMF/IT restrictions on /Applications
   home.activation.createAppAliases = lib.mkIf isDarwin (

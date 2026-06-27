@@ -281,7 +281,6 @@ in {
   ]
   ++ lib.optionals isDarwin ([
     pkgs.dockutil  # Dock management tool
-    pkgs.jankyborders  # Coloured border around the focused window (see darwin.nix)
     nowplaying-cli
   ] ++ (with casks; [
     firefox
