@@ -69,6 +69,15 @@ in {
       # Silence bells — prevents Alacritty dock bouncing on macOS
       set -g bell-action none
 
+      # Don't forward left-clicks into the focused app (default binding appends
+      # `send-keys -M`). Forwarding makes a window-focusing click land on whatever
+      # TUI menu option is under the cursor — e.g. accidentally selecting "Decline"
+      # on a Claude Code permission prompt. Selecting the pane is kept; scroll
+      # (WheelUpPane) and drag-to-copy (MouseDrag1Pane) are unaffected. Trade-off:
+      # click-to-position-point stops working in *terminal* Emacs (GUI emacsclient
+      # is unaffected).
+      bind -n MouseDown1Pane select-pane -t =
+
       # Scroll up enters copy mode automatically; prevents escape sequences leaking to shell
       bind -n WheelUpPane if-shell -F -t = "#{mouse_any_flag}" "send-keys -M" "if -Ft= '#{pane_in_mode}' 'send-keys -M' 'copy-mode -e'"
 
