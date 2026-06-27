@@ -10,6 +10,7 @@
 - No personal identifiable information
 - No internal server/machine names, hostnames, or work-specific infrastructure details
 - Before writing a commit message, check `git remote -v` — if the remote is a personal repo (e.g. github.com/mgrbyte), ensure the message contains no work-specific information (server names, internal project names, client names, contract details)
+- No conventional-commit type prefix in the summary (`feat:`/`fix:`/`test:`/`chore:`/`refactor:`) — write a plain description (plain Welsh for Welsh-language repos — the remote is identified in CLAUDE.md). A type prefix is a smell that the change warranted its own branch (a separate unit of work), not a commit on a shared branch.
 
 Example:
 
@@ -41,3 +42,8 @@ Short summary of the change
 **NEVER** run mutating git commands (`git add`, `git commit`, `git push`, `git reset`, `git checkout`, `git rebase`, `git merge`, `git stash`, `git tag`, `git branch -d/-D`) via `remoteExec` or any other MCP tool. This bypasses the user's local hooks that gate git operations.
 
 Instead: print the exact commands for the user to run themselves. This applies even when the commit content has been reviewed and approved — the user controls when git state changes.
+
+## Branch & Rebase Discipline
+
+- **One unit of work per branch.** If you reach for different `feat:`/`refactor:`/`fix:` prefixes to distinguish commits on a single branch, that's the signal the work should have been split into separate branches.
+- On a branch that accumulates many commits, rebase-clean **incrementally** — roughly every <10 commits — rather than one large interactive rebase at merge time (the latter is slow to analyse and conflict-prone). Squash each RED/GREEN pair into one commit soon after GREEN lands.
