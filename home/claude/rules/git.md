@@ -37,11 +37,16 @@ Short summary of the change
   - Another indented bullet (wrong)
 ```
 
-## No Mutating Git via Remote MCP
+## Run Git Through Bash So the Guard Applies
 
-**NEVER** run mutating git commands (`git add`, `git commit`, `git push`, `git reset`, `git checkout`, `git rebase`, `git merge`, `git stash`, `git tag`, `git branch -d/-D`) via `remoteExec` or any other MCP tool. This bypasses the user's local hooks that gate git operations.
+Run all git via the `Bash` tool. The pretooluse guard (`pretooluse-guard.py`) is
+branch-aware: mutating git is allowed on feature branches and blocked on
+`main`/`master` (including pushes or force-branch ops that *target* them).
 
-Instead: print the exact commands for the user to run themselves. This applies even when the commit content has been reviewed and approved — the user controls when git state changes.
+Never route git through an MCP tool that shells out and bypasses that guard
+(e.g. Serena `execute_shell_command`, or `mcp__emacs__eval-elisp` calling
+`shell-command`). There is no remote command execution tool — all dl6/remote git
+is the user's (see remote-dev-workflow.md).
 
 ## Branch & Rebase Discipline
 

@@ -3,7 +3,9 @@
 
 Guards:
 - Secrets: blocks Write/Edit to sensitive file paths
-- Git: blocks mutating git subcommands regardless of flags (e.g. git -C <path> commit)
+- Git: allows mutating git on feature branches; blocks anything that would
+  commit to, rewrite, push to, or force-update a protected branch (main/master),
+  regardless of flags (e.g. git -C <path> commit)
 - Pytest: auto-adds --tb=short -q
 """
 
@@ -11,8 +13,10 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import shlex
+import subprocess
 import sys
 from pathlib import Path
 
@@ -23,23 +27,52 @@ logging.basicConfig(
     format="%(asctime)s - %(message)s",
 )
 
-# Git subcommands that must never be run by Claude.
-# Matches the "deny" list in settings.json, but catches them
-# even when global git flags (e.g. -C <path>) appear before the subcommand.
-DENIED_GIT_SUBCOMMANDS = frozenset({
-    "commit",
-    "push",
-    "merge",
-    "rebase",
-    "reset",
-    "checkout",
-})
+# Branches Claude must never mutate. Mutating git is permitted on any other
+# (feature) branch, but blocked when it would commit to, rewrite, push to, or
+# force-update one of these.
+PROTECTED_BRANCHES = frozenset({"main", "master"})
 
-# Stash sub-subcommands that are denied.
-DENIED_GIT_STASH_SUBCOMMANDS = frozenset({
-    "drop",
-    "clear",
-})
+# Subcommands that rewrite/advance the *current* branch's history.
+# Blocked only when HEAD is on a protected branch.
+HISTORY_MUTATING_SUBCOMMANDS = frozenset(
+    {
+        "commit",
+        "merge",
+        "rebase",
+        "reset",
+    }
+)
+
+# git-add args that stage everything; too broad regardless of branch.
+BLANKET_ADD_ARGS = frozenset({"-A", "--all", "-u", "--update", "."})
+
+# checkout -b/-B and switch -c/-C (force-)create the branch named next.
+BRANCH_CREATE_FLAGS = frozenset({"-b", "-B", "-c", "-C"})
+
+# git-branch flags that delete/rename/copy/force-update an existing branch.
+BRANCH_MODIFY_FLAGS = frozenset(
+    {
+        "-C",
+        "-D",
+        "-M",
+        "-c",
+        "-d",
+        "-f",
+        "-m",
+        "--copy",
+        "--delete",
+        "--force",
+        "--move",
+    }
+)
+
+# Stash sub-subcommands that are denied (data loss; unrelated to branch).
+DENIED_GIT_STASH_SUBCOMMANDS = frozenset(
+    {
+        "drop",
+        "clear",
+    }
+)
 
 
 def deny(reason: str) -> None:
@@ -52,6 +85,20 @@ def deny(reason: str) -> None:
             "permissionDecision": "deny",
             "permissionDecisionReason": reason,
         }
+    }
+    print(json.dumps(output))
+    sys.exit(0)
+
+
+def allow(reason: str) -> None:
+    """Output a plain allow decision that bypasses the permission prompt."""
+    output = {
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "allow",
+            "permissionDecisionReason": reason,
+        },
+        "suppressOutput": True,
     }
     print(json.dumps(output))
     sys.exit(0)
@@ -83,7 +130,14 @@ def find_git_subcommand(parts: list[str]) -> tuple[str, list[str]]:
         (subcommand, remaining_args) or ("", []) if no subcommand found.
     """
     # Global flags that consume the next argument
-    flags_with_arg = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--super-prefix"}
+    flags_with_arg = {
+        "-C",
+        "-c",
+        "--git-dir",
+        "--work-tree",
+        "--namespace",
+        "--super-prefix",
+    }
     i = 1  # skip "git" itself
     while i < len(parts):
         token = parts[i]
@@ -96,8 +150,83 @@ def find_git_subcommand(parts: list[str]) -> tuple[str, list[str]]:
     return "", []
 
 
-def check_git_command(command: str) -> None:
-    """Block denied git mutating subcommands regardless of flags."""
+def git_working_dir(parts: list[str]) -> str | None:
+    """Return the path passed to `git -C <path>`, if any (last one wins)."""
+    cwd = None
+    i = 1
+    while i < len(parts):
+        if parts[i] == "-C" and i + 1 < len(parts):
+            cwd = parts[i + 1]
+            i += 2
+        else:
+            i += 1
+    return cwd
+
+
+def current_branch(cwd: str | None) -> str | None:
+    """Return the checked-out branch name, or None if detached/empty/unknown."""
+    command = ["git"]
+    if cwd:
+        command += ["-C", cwd]
+    command += ["rev-parse", "--abbrev-ref", "HEAD"]
+    try:
+        result = subprocess.run(command, capture_output=True, text=True, timeout=3)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if result.returncode != 0:
+        return None
+    branch = result.stdout.strip()
+    if not branch or branch == "HEAD":  # empty repo or detached HEAD
+        return None
+    return branch
+
+
+def on_protected_branch(cwd: str | None) -> bool:
+    return current_branch(cwd) in PROTECTED_BRANCHES
+
+
+def push_targets_protected(args: list[str]) -> bool:
+    """True if a push would write to a protected branch on the remote."""
+    positionals = []
+    for arg in args:
+        if arg in ("--all", "--mirror"):
+            return True
+        if arg.startswith("-"):
+            continue
+        positionals.append(arg)
+    # positionals[0] is the remote; the rest are refspecs (src[:dst], leading + = force).
+    for spec in positionals[1:]:
+        spec = spec.lstrip("+")
+        dst = spec.split(":", 1)[1] if ":" in spec else spec
+        if dst.rsplit("/", 1)[-1] in PROTECTED_BRANCHES:
+            return True
+    return False
+
+
+def checkout_creates_protected(args: list[str]) -> bool:
+    """True if checkout/switch would (force-)create a protected branch."""
+    for i, token in enumerate(args):
+        if token in BRANCH_CREATE_FLAGS and i + 1 < len(args):
+            if args[i + 1].rsplit("/", 1)[-1] in PROTECTED_BRANCHES:
+                return True
+    return False
+
+
+def branch_modifies_protected(args: list[str]) -> bool:
+    """True if `git branch` would delete/rename/copy/force-update a protected branch."""
+    if not any(arg in BRANCH_MODIFY_FLAGS for arg in args):
+        return False
+    for token in args:
+        if token.startswith("-"):
+            continue
+        if token.rsplit("/", 1)[-1] in PROTECTED_BRANCHES:
+            return True
+    return False
+
+
+def check_git_command(command: str, default_cwd: str) -> None:
+    """Allow git on feature branches; block anything touching a protected branch."""
+    protected = "/".join(sorted(PROTECTED_BRANCHES))
     # Handle chained commands: split on && and ; and check each part
     for segment in re.split(r"&&|;|\|\|", command):
         segment = segment.strip()
@@ -110,17 +239,45 @@ def check_git_command(command: str) -> None:
         if not parts or parts[0] != "git":
             continue
         subcommand, remaining = find_git_subcommand(parts)
-        if subcommand in DENIED_GIT_SUBCOMMANDS:
-            deny(f"Blocked: mutating git operation 'git {subcommand}' is not permitted.")
+        cwd = git_working_dir(parts) or default_cwd
+        if subcommand in HISTORY_MUTATING_SUBCOMMANDS:
+            if on_protected_branch(cwd):
+                deny(
+                    f"Blocked: 'git {subcommand}' on a protected branch ({protected}). "
+                    "Switch to a feature branch first."
+                )
+            continue
+        if subcommand == "push":
+            if on_protected_branch(cwd):
+                deny(f"Blocked: 'git push' from a protected branch ({protected}).")
+            if push_targets_protected(remaining):
+                deny(f"Blocked: 'git push' targets a protected branch ({protected}).")
+            continue
+        if subcommand in ("checkout", "switch"):
+            if checkout_creates_protected(remaining):
+                deny(
+                    f"Blocked: 'git {subcommand}' would force-create a protected branch ({protected})."
+                )
+            continue
+        if subcommand == "branch":
+            if branch_modifies_protected(remaining):
+                deny(
+                    f"Blocked: 'git branch' would delete/rename/force-update a protected branch ({protected})."
+                )
+            continue
         if subcommand == "add" and remaining:
-            blanket_flags = {"-A", "--all", "-u", "--update", "."}
             for arg in remaining:
-                if arg in blanket_flags:
-                    deny(f"Blocked: 'git add {arg}' is too broad. Add specific files instead.")
+                if arg in BLANKET_ADD_ARGS:
+                    deny(
+                        f"Blocked: 'git add {arg}' is too broad. Add specific files instead."
+                    )
+            continue
         if subcommand == "stash" and remaining:
             stash_action = remaining[0]
             if stash_action in DENIED_GIT_STASH_SUBCOMMANDS:
-                deny(f"Blocked: mutating git operation 'git stash {stash_action}' is not permitted.")
+                deny(
+                    f"Blocked: mutating git operation 'git stash {stash_action}' is not permitted."
+                )
 
 
 def check_secrets(file_path: str) -> None:
@@ -130,10 +287,12 @@ def check_secrets(file_path: str) -> None:
         deny(f"Blocked: {file_path} appears to contain secrets. Manual edit required.")
 
 
-DENIED_RELEASE_COMMANDS = frozenset({
-    "techiaith-dev version release",
-    "techiaith-dev version bump",
-})
+DENIED_RELEASE_COMMANDS = frozenset(
+    {
+        "techiaith-dev version release",
+        "techiaith-dev version bump",
+    }
+)
 
 
 def check_release_commands(command: str) -> None:
@@ -200,6 +359,50 @@ def tweak_pytest(command: str) -> None:
         )
 
 
+# Directories where any command (except deletions) is auto-approved without a
+# permission prompt, keyed on the session working directory. Mirrors the Read
+# allow-list in settings.json.
+PROJECT_DIRS = tuple(
+    str(Path(p).expanduser().resolve())
+    for p in ("~/github", "~/gitlab/cyfieithu-ac-llms", "~/gitlab/mtr21pqh")
+)
+
+# Command words never auto-approved by PROJECT_DIRS — they still fall through to
+# settings.json `ask`/`deny` (deletions prompt; pip is denied there).
+NEVER_AUTO_ALLOW = frozenset({"pip", "pip3", "rm", "unlink"})
+
+
+def within_project_dir(cwd: str) -> bool:
+    """True if CWD is inside one of the auto-approve project directories."""
+    if not cwd:
+        return False
+    try:
+        real = str(Path(cwd).resolve())
+    except (OSError, RuntimeError):
+        return False
+    return any(real == d or real.startswith(f"{d}/") for d in PROJECT_DIRS)
+
+
+def maybe_auto_allow(command: str, cwd: str) -> None:
+    """Auto-approve a command (except deletions) run inside a project directory.
+
+    Runs after the deny-guards, so protected-branch git, secrets, pip and release
+    blocks always take precedence. Deletions (rm/unlink) and the .venv escape
+    hatch fall through to the settings.json rules so the user is still prompted.
+    """
+    if not within_project_dir(cwd):
+        return
+    if ".venv/bin" in command:
+        return
+    try:
+        tokens = shlex.split(command)
+    except ValueError:
+        return
+    if any(token in NEVER_AUTO_ALLOW for token in tokens):
+        return
+    allow("Auto-approved: command in a trusted project directory.")
+
+
 def main() -> None:
     try:
         input_data = json.load(sys.stdin)
@@ -214,10 +417,12 @@ def main() -> None:
 
     if tool_name == "Bash":
         command = tool_input.get("command", "")
-        check_git_command(command)
+        cwd = input_data.get("cwd") or os.getcwd()
+        check_git_command(command, cwd)
         check_release_commands(command)
         check_pip(command)
         tweak_pytest(command)
+        maybe_auto_allow(command, cwd)
 
     logging.info(f"PASSED: {tool_name}")
     sys.exit(0)

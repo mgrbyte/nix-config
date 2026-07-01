@@ -60,6 +60,7 @@ let
     "CLAUDE.md"
     "settings.json"
     "rules/org.md"
+    "rules/remote-dev-workflow.md"
   ];
 
 in {

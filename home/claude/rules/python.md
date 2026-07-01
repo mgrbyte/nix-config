@@ -41,6 +41,12 @@ Apply where possible, not dogmatically. Pragmatic exceptions: pydantic/dataclass
 fields before defaulted ones (alpha within each group, not across); runtime definition-order
 dependencies; circular-import resolution.
 
+**Attr vs CONSTANT (casing).** `UPPER_CASE` is for true constants — immutable values (field-name
+strings, frozen taxonomies). A module-level **singleton / cache instance** (a memoised
+`tldextract.TLDExtract()`, a compiled client, a connection pool, etc.) is an *attr*: name it
+**lowercase**, `_`-prefixed when it's a protected impl detail — e.g. `_tldextract`, not `_EXTRACT`.
+Casing follows kind, so this also sets the ordering slot (attrs sort before CONSTANTS).
+
 ## Imports
 
 The decision is "does qualifying with the module name earn its place at the call site?" — not a
@@ -71,6 +77,15 @@ count threshold.
 - **Excluding a single element:** use the collection's native removal, not a `!=` comprehension
   filter — `list.remove(x)` for a known list where `x` is present; `dict.pop(key, None)` for dicts /
   schema-metadata (safe even if the key is absent).
+
+## Data Structures
+
+- **Prefer a `NamedTuple` or `@dataclass` over an anonymous tuple (or bare dict) for any structured
+  value** — name the fields and type them. This is non-negotiable for data structures on a
+  design/implementation **critical path**: values returned across a function/module boundary,
+  persisted, or central to a stage/pipeline's contract. Anonymous tuples force positional unpacking
+  and hide intent (`x[2]` vs `x.version`). Bare tuples are acceptable only for trivial, local,
+  short-lived pairs with self-evident positional meaning.
 
 ## Regular Expressions
 
