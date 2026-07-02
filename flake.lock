@@ -221,11 +221,11 @@
     "nix-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1781847949,
-        "narHash": "sha256-iaTRsJrHtGgbUQIaPs+C0/wb3WnajuejrQxXQGHUp/A=",
+        "lastModified": 1783017147,
+        "narHash": "sha256-PpQWpGfWm/VXbTyFyX3/Ahl0KarPBxajrF45dn+XZfs=",
         "ref": "refs/heads/main",
-        "rev": "cc9abce4fd3f865823242822fb54b5b84004308f",
-        "revCount": 36,
+        "rev": "406cb665c466fe8fe4cfb7fa338511b4ffb7d1e4",
+        "revCount": 37,
         "type": "git",
         "url": "ssh://git@github.com/mgrbyte/nix-secrets"
       },
