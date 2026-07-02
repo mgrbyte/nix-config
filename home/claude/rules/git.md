@@ -48,7 +48,28 @@ Never route git through an MCP tool that shells out and bypasses that guard
 `shell-command`). There is no remote command execution tool — all dl6/remote git
 is the user's (see remote-dev-workflow.md).
 
+## Branch Creation & Upstream Discipline
+
+- **Never create a branch with its upstream pointing at `origin/main`.** `git checkout -b X
+  origin/main` silently sets upstream to `origin/main`; the user pushes from magit, and magit's
+  push-to-upstream (`P u`) then pushes the feature branch's commits **directly onto main**
+  (this happened 2026-07-02: a failing RED test commit landed on a repo's main and needed a
+  force-with-lease restore).
+- **Branch from the local ref** (after confirming it matches the remote): `git fetch` then
+  `git checkout -b X main` — never name `origin/main` as the start point.
+- **Push every new branch immediately after its first commit** with `git push -u origin X`,
+  so the upstream always points at the branch's own remote ref. A branch must never sit
+  locally with commits and a wrong (or absent) upstream waiting for a magit push.
+- **Verify before hand-off:** `git status --short --branch` must show `X...origin/X`, not
+  `X...origin/main`.
+
 ## Branch & Rebase Discipline
 
 - **One unit of work per branch.** If you reach for different `feat:`/`refactor:`/`fix:` prefixes to distinguish commits on a single branch, that's the signal the work should have been split into separate branches.
 - On a branch that accumulates many commits, rebase-clean **incrementally** — roughly every <10 commits — rather than one large interactive rebase at merge time (the latter is slow to analyse and conflict-prone). Squash each RED/GREEN pair into one commit soon after GREEN lands.
+- **Squash mechanics (Claude's environment has no interactive rebase):** to squash the last N
+  contiguous commits on a branch, use `git reset --soft HEAD~N && git commit` — HEAD moves back N
+  commits while index and worktree keep the final state, and one new commit recreates the combined
+  change (tree-identical to a `rebase -i` squash). Only valid for a contiguous run ending at HEAD;
+  anything needing reordering, splitting, or replaying onto a new base is a true `git rebase`
+  (non-interactive `git rebase <newbase>` / `--onto`) and its conflicts are resolved per-commit.
