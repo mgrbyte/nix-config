@@ -198,6 +198,7 @@ in {
     age-plugin-yubikey
     gnupg
     libfido2
+    rage
 
     # Terminal
     alacritty
