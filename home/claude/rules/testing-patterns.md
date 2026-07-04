@@ -73,3 +73,8 @@ an unpinned reference to live code drifts and later reads as "doesn't exist, mus
 
 Unit tests mirror the source tree: `tests/unit/techiaith/cli/test_ui.py`
 for `src/techiaith/cli/ui.py`.
+
+## Mocking
+
+- Use `pytest_mock.MockerFixture` over `pytest.MonkeyPatch`
+
