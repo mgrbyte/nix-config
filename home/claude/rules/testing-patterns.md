@@ -78,3 +78,37 @@ for `src/techiaith/cli/ui.py`.
 
 - Use `pytest_mock.MockerFixture` over `pytest.MonkeyPatch`
 
+
+## Typer CLI Testing
+
+Test typer CLIs through `techiaith.testing.invoke_cli` (from `techiaith-testing`, already
+in every techiaith package's dev dependencies) — never by constructing a
+`typer.testing.CliRunner` per test module.
+
+- `invoke_cli(app, sub_cmd_args, global_options=())` places global options before the
+  subcommand and stringifies every argument (`Path`s, ints, etc.).
+- It returns `typer.testing.Result`: assert on `result.exit_code`, `result.stdout` and
+  `result.stderr` (Click 8.2+ always separates them; `result.output` is the mixed
+  terminal view — handy in failure messages).
+- One test class per command, with a typed `call_cmd` (see call_fut / call_mut /
+  call_cmd above); patch the modules the CLI calls with `mocker` (see Mocking above).
+
+```python
+from pytest_mock import MockerFixture
+from techiaith.testing import invoke_cli
+from typer.testing import Result
+
+from mypackage import cli, widget
+
+
+class TestResizeCommand:
+    def call_cmd(self, args: list[str]) -> Result:
+        return invoke_cli(cli.app, args)
+
+    def test_resizes_and_prints_the_result(self, mocker: MockerFixture) -> None:
+        resize = mocker.patch.object(widget, "resize", return_value=4)
+        result = self.call_cmd(["resize", "--factor", "2"])
+        assert result.exit_code == 0, result.output
+        resize.assert_called_once_with(factor=2.0)
+        assert "4" in result.stdout
+```
