@@ -61,6 +61,8 @@ let
     "settings.json"
     "rules/org.md"
     "rules/remote-dev-workflow.md"
+    "rules/gitlab-tasks.md"
+    "commands/current-epic.md"
   ];
 
 in {
