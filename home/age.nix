@@ -34,10 +34,6 @@ let
       source = "${nix-secrets}/personal.netrc.age";
       symlinks = lib.optionals (user == "mgrbyte") [ "${homeDir}/.netrc" ];
     };
-    "init-gitlab-sync-config" = {
-      source = "${nix-secrets}/init-gitlab-sync-config.el.age";
-      symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.emacs.d/lisp/init-gitlab-sync-config.el" ];
-    };
     "id_ed25519_mtr21pqh_falcon" = {
       source = "${nix-secrets}/id_ed25519_mtr21pqh_falcon.age";
       symlinks = lib.optionals (user == "mtr21pqh") [ "${homeDir}/.ssh/id_ed25519_mtr21pqh_falcon" ];
