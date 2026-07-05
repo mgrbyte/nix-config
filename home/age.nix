@@ -48,7 +48,7 @@ let
     };
     "techiaith-epicworkmgr" = {
       source = "${nix-secrets}/techiaith-epicworkmgr.age";
-      symlinks = [ "${homeDir}/path/to/target" ];
+      symlinks = [ "${homeDir}/.config/techiaith-epicworkmgr/config.toml" ];
     };
   };
 in
