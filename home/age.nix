@@ -46,6 +46,10 @@ let
       source = "${nix-secrets}/allowed-signers.age";
       symlinks = [ "${homeDir}/.ssh/allowed_signers" ];
     };
+    "techiaith-epicworkmgr" = {
+      source = "${nix-secrets}/techiaith-epicworkmgr.age";
+      symlinks = [ "${homeDir}/path/to/target" ];
+    };
   };
 in
 {
@@ -90,6 +94,12 @@ in
   # Secret rotation helper
   home.file.".local/bin/update-secret" = {
     source = ../scripts/update-secret;
+    executable = true;
+  };
+
+  # Secret creation helper
+  home.file.".local/bin/add-secret" = {
+    source = ../scripts/add-secret;
     executable = true;
   };
 
