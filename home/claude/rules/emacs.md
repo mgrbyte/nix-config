@@ -20,6 +20,24 @@ hm-emacs-update
 - Same pattern applies to `~/github/mgrbyte/emacs-abyss-theme/` (published to MELPA)
 - Always edit the source repos, never the nix store paths
 
+## Public Repository — No Internal Work Data
+
+`~/github/mgrbyte/emacs.d` is a **public** GitHub repository. Never commit
+internal or work-confidential details to it:
+
+- client/project names, internal service or GitLab hostnames, group/namespace
+  paths, or real epic/issue/ticket titles
+- any data captured from the output of work tools
+
+Module code that *wraps* a work tool is fine (the tool's own command and buffer
+names are acceptable), but **all committed test fixtures and assertions must use
+synthetic data** (e.g. `gitlab.example.com`, `acme/team/widget-api`, generic
+titles). Derive real values at runtime; never bake them into `tests/`.
+
+Before committing anything under `emacs.d/`, grep the staged files for internal
+tokens and confirm none are present. Note: `.serena/` is gitignored (plans stay
+local), but `tests/` **is** committed — that is the exposure.
+
 ## Debugging Emacs Issues
 
 When debugging Emacs configuration issues:
