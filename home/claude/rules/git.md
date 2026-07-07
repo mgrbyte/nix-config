@@ -48,6 +48,29 @@ Never route git through an MCP tool that shells out and bypasses that guard
 `shell-command`). There is no remote command execution tool — all dl6/remote git
 is the user's (see remote-dev-workflow.md).
 
+## Issue-First Branch & Fix-Commit Protocol
+
+Applies to every `bugfix/*` and `feature/*` branch.
+
+- **File the GitLab issue before creating the branch.** No `bugfix/*` or `feature/*`
+  branch is created until its tracking issue exists (see gitlab-tasks.md for `glab`
+  creation, placement, epic parenting, and labels). This makes the issue number `#N`
+  known before any code is written.
+- **Reference `Fixes #N` in the verified fix commit, before the branch is pushed.**
+  Use the plain GitLab closing keyword `Fixes #N` (no parentheses) as a trailing
+  footer line or a body bullet — it auto-closes the issue on merge to the default
+  branch. Once the whole test suite passes *and/or* manual verification of the fix is
+  complete, the GREEN commit that lands the verified change carries the `Fixes #N`
+  reference. Do not push the branch until it does. For a change validated by a
+  real-stack round-trip rather than a unit test (e.g. a config value — see the
+  no-literal-config-tests rule), the trigger is "manual verification complete", not a
+  green suite.
+- Same protocol for `feature/*` branches — `Fixes #N` on the completed, verified
+  feature commit.
+- **Lifecycle order:** file issue → create branch (see Branch Creation & Upstream
+  Discipline) → RED/GREEN cycle → verify (suite green and/or manual check) → GREEN
+  commit with `Fixes #N` → push.
+
 ## Branch Creation & Upstream Discipline
 
 - **Never create a branch with its upstream pointing at `origin/main`.** `git checkout -b X

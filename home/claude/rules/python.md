@@ -6,6 +6,37 @@ paths:
 
 # Python Preferences
 
+## Pre-flight Self-Audit
+
+**Before presenting or committing any Python you wrote or edited, walk this list.** `ruff`/`ty` do
+NOT catch most of these — they are the conventions most often missed. Each item links to the detailed
+section below (or `testing-patterns.md`). This is a blocking step, not advisory.
+
+- **Symbol order** — kind → visibility → name in *every* namespace. Module: attrs → CONSTANTS →
+  functions → classes; class: data → `__dunder__` → properties → methods. Within a kind:
+  `__dunder__` → `__mangled` → `_protected` → public, then a-z (public lowercase before UPPERCASE).
+  → *Symbol Ordering*
+- **Visibility** — public by default; a leading `_` only for a true impl detail never imported
+  elsewhere and not asserted by a test. → *Symbol Visibility*
+- **Imports** — a function monkeypatched in tests is `import module; module.func` (patched at its
+  definition-site module), never `from module import func`; one import style per module; relative
+  within `src/`; no inline imports. → *Imports*
+- **Tests** — no leading underscore on any test class / method / **fixture** / helper; `call_fut` /
+  `call_mut` / `call_cmd` take `self` (never `@staticmethod`); module-under-test imported at top and
+  qualified; test methods annotated `-> None`. → *testing-patterns.md*
+- **Annotations** — never `from __future__ import annotations`; don't quote a name unless a forward
+  reference is genuinely forced; place the primary data type on top to avoid the forward ref.
+- **Function bodies** — no blank lines inside (unless genuinely complex).
+- **Constants / singletons** — module constants blank-line-separated; a module-level singleton/cache
+  instance is a lowercase attr (`_client`), not `UPPER_CASE`.
+- **Literals** — a-z only within order-insensitive literals; preserve meaning-order otherwise; a dict
+  spread's position is load-bearing (later keys win). → *Literals & Single-Value Operations*
+- **Single-value exclusion** — `list.remove(x)` / `dict.pop(k, None)`, not a `!=` comprehension.
+- **Regex** — document a complex *and* non-obvious pattern (VERBOSE / named non-capturing fragments);
+  named capture groups only when the captures are read. → *Regular Expressions*
+- **Docstrings** — none that merely restate the name or signature.
+- **Prefer** early-return / single-exit and positive conditionals; British English spelling.
+
 ## Style & Formatting
 
 - Always 4 spaces for indentation
