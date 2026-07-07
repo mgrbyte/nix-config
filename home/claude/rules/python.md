@@ -21,9 +21,10 @@ section below (or `testing-patterns.md`). This is a blocking step, not advisory.
 - **Imports** — a function monkeypatched in tests is `import module; module.func` (patched at its
   definition-site module), never `from module import func`; one import style per module; relative
   within `src/`; no inline imports. → *Imports*
-- **Tests** — no leading underscore on any test class / method / **fixture** / helper; `call_fut` /
-  `call_mut` / `call_cmd` take `self` (never `@staticmethod`); module-under-test imported at top and
-  qualified; test methods annotated `-> None`. → *testing-patterns.md*
+- **Tests** — located under `tests/unit/` mirroring the source tree; no leading underscore on any
+  test class / method / **fixture** / helper; `call_fut` / `call_mut` / `call_cmd` take `self`
+  (never `@staticmethod`); module-under-test imported at top and qualified; test methods annotated
+  `-> None`. → *testing-patterns.md*
 - **Annotations** — never `from __future__ import annotations`; don't quote a name unless a forward
   reference is genuinely forced; place the primary data type on top to avoid the forward ref.
 - **Function bodies** — no blank lines inside (unless genuinely complex).
@@ -35,7 +36,10 @@ section below (or `testing-patterns.md`). This is a blocking step, not advisory.
 - **Regex** — document a complex *and* non-obvious pattern (VERBOSE / named non-capturing fragments);
   named capture groups only when the captures are read. → *Regular Expressions*
 - **Docstrings** — none that merely restate the name or signature.
-- **Prefer** early-return / single-exit and positive conditionals; British English spelling.
+- **Naming** — no stutter: a symbol name must not repeat its module name
+  (`content_language.identify`, not `content_language.identify_content_language`).
+- **Single exit** — prefer one return path; avoid multiple returns. Positive conditionals — avoid
+  negation where a positive form reads as well. British English spelling.
 
 ## Style & Formatting
 

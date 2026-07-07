@@ -42,11 +42,11 @@ Commit the fix separately from the current work, but do not defer it.
 
 Never suggest `git commit --amend` for commits that have already been pushed. Always create a new commit instead. Force pushing rewrites shared history and disrupts the workflow, even when "safe".
 
-## Plan File Management
+## Plan Management
 
-- Plans live in the **active project's `.serena/memories/`** as `<slug>-plan.md` (version-controlled,
-  not `~/.claude/plans/`). Persist the approved plan there before writing code.
-- **Never overwrite or replace** an existing plan; create a new `<slug>-plan.md` for a new plan.
-- Plan files are immutable records of decisions made — they should not be repurposed for unrelated work.
-- Completed plans stay in `.serena/memories/` (git history is the archive). Legacy `~/.claude/plans/`
-  plans were archived to `~/github/mgrbyte/vibing/archive/claude-plans/`.
+- Plans live in the **tracking GitLab issue's description** (one issue per unit of work). Persist the
+  approved plan there before writing code — **prepend/merge** with the existing issue statement.
+- **Never overwrite** the existing statement/plan; add to it. A new unit of work = a new issue.
+- The plan is an immutable record of decisions made — not repurposed for unrelated work.
+- The issue (+ GitLab's description edit history) is the archive. Legacy `.serena/memories/<slug>-plan.md`
+  and `~/.claude/plans/` plans were archived to `~/github/mgrbyte/vibing/archive/claude-plans/`.
