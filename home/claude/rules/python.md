@@ -53,6 +53,10 @@ section below (or `testing-patterns.md`). This is a blocking step, not advisory.
 - NEVER add blank lines in function or method definitions, UNLESS the code is sufficiently complex to warrant doing so.
 - DO NOT add inline `# type: ignore` to suppress typing errors UNLESS it's the only option/last resort.
 - Separate module level constants with blank lines.
+- Never name a local variable with a single letter that collides with a pdb command
+  (`a b c d h j l n p q r s u w`) — under `python -m pdb …` / `pdb.set_trace()` such a name hijacks
+  stepping (a local `c` triggers `continue`, `n` `next`, `s` `step`, …). Prefer a descriptive name;
+  if a genuinely short one is warranted, pick a non-colliding letter (`e f g i k m o t v x y z`).
 
 ## Symbol Visibility
 
@@ -98,6 +102,12 @@ count threshold.
   `import module`.
 - **One style per imported module per file** — never mix `from m import a` with `import m; m.b` for
   the same `m`.
+- **Never let a `from module import …` wrap into a parenthesised / multi-line form.** That wrap is
+  the hard signal to switch to `import module` + qualify at call sites. It layers on the aesthetic
+  call above rather than replacing it: in practice a single-line from-import tops out around ~5
+  names under the length limit; past that (or if it would wrap), qualify — e.g. `import pydantic`
+  (`pydantic.BaseModel`, `pydantic.Field`, `pydantic.field_validator`, …) beats a 7-name
+  parenthesised `from pydantic import (…)`.
 - (Intra-package imports within `src/` stay relative — see Style & Formatting above.)
 
 ## Literals & Single-Value Operations
