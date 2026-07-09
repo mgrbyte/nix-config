@@ -62,6 +62,7 @@ let
     "rules/org.md"
     "rules/remote-dev-workflow.md"
     "rules/gitlab-tasks.md"
+    "rules/gitlab-workflow.md"
     "commands/current-epic.md"
   ];
 
