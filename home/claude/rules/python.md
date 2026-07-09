@@ -25,6 +25,9 @@ section below (or `testing-patterns.md`). This is a blocking step, not advisory.
   test class / method / **fixture** / helper; `call_fut` / `call_mut` / `call_cmd` take `self`
   (never `@staticmethod`); module-under-test imported at top and qualified; test methods annotated
   `-> None`. → *testing-patterns.md*
+- **Mocking** — `pytest_mock.MockerFixture`, never `pytest.MonkeyPatch`. This beats
+  match-the-surrounding-file: a pre-rule test file using MonkeyPatch is not licence to propagate
+  it — new tests take `mocker`, and convert the class you touch. → *testing-patterns.md*
 - **Annotations** — never `from __future__ import annotations`; don't quote a name unless a forward
   reference is genuinely forced; place the primary data type on top to avoid the forward ref.
 - **Function bodies** — no blank lines inside (unless genuinely complex).

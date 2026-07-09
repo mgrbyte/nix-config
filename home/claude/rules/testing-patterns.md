@@ -77,6 +77,12 @@ for `src/techiaith/cli/ui.py`.
 ## Mocking
 
 - Use `pytest_mock.MockerFixture` over `pytest.MonkeyPatch`
+- **Precedence over local consistency**: an existing test file written with `MonkeyPatch`
+  (pre-dating this rule) is NOT a reason to write new tests with it — "match the surrounding
+  code" does not apply to deprecated patterns. New tests always take `mocker: MockerFixture`;
+  when touching a class that uses `MonkeyPatch`, convert that class in the same change.
+- Prefer `mocker.patch.object(module, "name", ...)` (definition-site, returns the mock for
+  assertions) over string-path `mocker.patch("pkg.module.name")`
 
 
 ## Typer CLI Testing
