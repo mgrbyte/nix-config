@@ -33,6 +33,10 @@ All test methods and `call_fut`/`call_mut` must have type annotations
   collection *prefix*) or, for a mixin of shared assertions, a descriptive name like
   `FoobarCommonChecks`. Real test classes keep the `Test` prefix.
 - Each test method exercises one set of preconditions
+- **Structurally arbitrary fixture values get unmistakably fake names** (`dir-a`, `stage1`) —
+  never spellings of real production values, current *or* retired. A real-looking name falsely
+  reads as contract coupling; a retired one additionally hides drift (a stale-vocabulary fixture
+  let a real sync-path regression through review, 2026-07-09).
 - Minimise shared state — use helpers returning local variables, not `self` attributes
 - Descriptive test method names that clarify intent
 - No inline comments as section separators — use subclasses named accordingly

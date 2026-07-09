@@ -69,7 +69,8 @@ Applies to every `bugfix/*` and `feature/*` branch.
   feature commit.
 - **Lifecycle order:** file issue → create branch (see Branch Creation & Upstream
   Discipline) → RED/GREEN cycle → verify (suite green and/or manual check) → GREEN
-  commit with `Fixes #N` → push.
+  commit with `Fixes #N` → push → create the MR → user reviews & merges. (MR mechanics
+  live in the private workflow rules: gitlab-workflow.md.)
 
 ## Branch Creation & Upstream Discipline
 
