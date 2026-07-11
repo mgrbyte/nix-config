@@ -38,7 +38,8 @@ section below (or `testing-patterns.md`). This is a blocking step, not advisory.
 - **Single-value exclusion** — `list.remove(x)` / `dict.pop(k, None)`, not a `!=` comprehension.
 - **Regex** — document a complex *and* non-obvious pattern (VERBOSE / named non-capturing fragments);
   named capture groups only when the captures are read. → *Regular Expressions*
-- **Docstrings** — none that merely restate the name or signature.
+- **Docstrings** — none that merely restate the name or signature; English only; mkdocs
+  (Google-section) style with backtick-quoted parameter names. → *Docstrings*
 - **Naming** — no stutter: a symbol name must not repeat its module name
   (`content_language.identify`, not `content_language.identify_content_language`).
 - **Single exit** — prefer one return path; avoid multiple returns. Positive conditionals — avoid
@@ -125,6 +126,15 @@ count threshold.
 - **Excluding a single element:** use the collection's native removal, not a `!=` comprehension
   filter — `list.remove(x)` for a known list where `x` is present; `dict.pop(key, None)` for dicts /
   schema-metadata (safe even if the key is absent).
+
+## Docstrings
+
+- **mkdocs style** (Google sections, as `mkdocstrings` renders them): a one-line imperative
+  summary; a blank line before any `Args:` / `Returns:` / `Raises:` sections; parameter and
+  symbol names in prose are `backtick`-quoted.
+- Only add sections when they carry information the signature doesn't — a fully-annotated
+  small function usually needs the summary line only.
+- Never a docstring that merely restates the name or signature.
 
 ## Data Structures
 

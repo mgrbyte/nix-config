@@ -5,28 +5,14 @@
 - Trim trailing white space before saving files.
 - Don't add redundant comments that can be easily inferred by reading the code.
 
-## Language Policy (Commit Messages & Documentation)
+## Comments vs Commit Messages
 
-**Welsh-first** (bilingual documentation encouraged):
-
-- Any repository matching the Welsh-language git remotes defined in CLAUDE.md
-- Any repository recursively under `~/github/techiaith/`
-- Commit messages in Welsh
-- Documentation in Welsh (bilingual Welsh + English preferred where appropriate)
-
-**English only**:
-
-- Any repository recursively under `~/github/mgrbyte/`
-- Standalone packages/submodules (candidates for public release to PyPI, etc.)
-- Commit messages in English
-- Documentation in English
-
-**Conversations**: Always in English, with a Welsh farewell when signing off:
-
-- "Nos da!" — good night (evening/night only)
-- "Hwyl!" — bye (informal, any time)
-- "Wela chdi wedyn" — see you later
-- "Hwyl am yr tro" — bye for now
+- History belongs in the commit message, never in a comment — a comment carrying a date or a
+  past-tense verb ("previously", "used to") is a commit message that escaped; move the narrative
+  there and let `git blame` connect it to the line.
+- Comments may state standing constraints the code cannot express — invariants and "do NOT do the
+  obvious thing here" tripwires — in timeless present tense, terse, no dates.
+- Trim pre-existing narrative comments opportunistically, when a change next touches their file.
 
 ## No Quick Fixes
 
@@ -41,12 +27,3 @@ Commit the fix separately from the current work, but do not defer it.
 ## Git History
 
 Never suggest `git commit --amend` for commits that have already been pushed. Always create a new commit instead. Force pushing rewrites shared history and disrupts the workflow, even when "safe".
-
-## Plan Management
-
-- Plans live in the **tracking GitLab issue's description** (one issue per unit of work). Persist the
-  approved plan there before writing code — **prepend/merge** with the existing issue statement.
-- **Never overwrite** the existing statement/plan; add to it. A new unit of work = a new issue.
-- The plan is an immutable record of decisions made — not repurposed for unrelated work.
-- The issue (+ GitLab's description edit history) is the archive. Legacy `.serena/memories/<slug>-plan.md`
-  and `~/.claude/plans/` plans were archived to `~/github/mgrbyte/vibing/archive/claude-plans/`.
