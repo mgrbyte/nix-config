@@ -14,6 +14,14 @@
   obvious thing here" tripwires — in timeless present tense, terse, no dates.
 - Trim pre-existing narrative comments opportunistically, when a change next touches their file.
 
+## No Conversational Shorthand in Persisted Artifacts
+
+Project and package nicknames coined in conversation (abbreviations, acronyms) stay in
+conversation. In code, comments, commit messages, GitLab items (issues, MRs, notes), and Serena
+memories, always write the full project/package name. The shorthand is unknown to other readers
+and to future-you, and cross-project GitLab references only resolve against the real project
+path, never a nickname.
+
 ## No Quick Fixes
 
 Never suggest quick/hacky workarounds. Always propose the proper fix, even if it takes longer. The user prefers reproducible, correct solutions over expedient ones that accumulate technical debt.

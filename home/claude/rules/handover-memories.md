@@ -27,6 +27,16 @@ language/git convention), that means editing the relevant versioned doc/rule, no
 Route by scope: universal working practice → `working-with-claude.md`; language/git/tooling
 convention → the matching `rules/*.md`; genuinely project-specific fact → project Claude-memory.
 
+## `.serena/project.yml` Is Untracked by Policy
+
+`.serena/project.yml` is tool-authored: Serena regenerates its comments and migrates its own
+settings schema on activation, so tracking it dirties every repo on every Serena upgrade with
+diffs nobody reviews. Policy (agreed 2026-07-13): in every repo it is untracked and ignored via
+`.serena/.gitignore` (entry `project.yml` — relative to that directory), after
+`git rm --cached -f .serena/project.yml`. Do NOT suggest tracking it, committing its churn, or
+ignoring `.serena/` wholesale — `.serena/memories/` stays version-controlled. Exception: a repo
+with genuinely customised Serena config may track it, reversing the policy in that repo only.
+
 ## Serena Project Activation
 
 - **Never activate a Serena project in a non-git-repo directory.** Before activating, verify the directory is a git repo root (contains `.git/`). If it doesn't, find the correct git repo subdirectory.
