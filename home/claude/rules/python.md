@@ -42,6 +42,14 @@ section below (or `testing-patterns.md`). This is a blocking step, not advisory.
   (Google-section) style with backtick-quoted parameter names. → *Docstrings*
 - **Naming** — no stutter: a symbol name must not repeat its module name
   (`content_language.identify`, not `content_language.identify_content_language`).
+  **Granted exception (resolved in a prior session; captured 2026-07-15): exception
+  classes.** `config.ConfigError` is correct despite the stutter — never propose renaming
+  an exception class to bare `Error` for stutter compliance; do not relitigate.
+  **A non-exception stutter is a conflation smell, not a thesaurus prompt** (resolved
+  2026-07-15): before reaching for a synonym, ask what two concerns the class is mixing —
+  `config.Config` resolved into `models.gitlab.AgendaScope` (pure data, named for what it
+  is) plus module-level `config.load`/`config.dump` (the file format), not into
+  `config.Settings`.
 - **Single exit** — prefer one return path; avoid multiple returns. Positive conditionals — avoid
   negation where a positive form reads as well. British English spelling.
 

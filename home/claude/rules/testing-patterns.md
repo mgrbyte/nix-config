@@ -78,6 +78,11 @@ an unpinned reference to live code drifts and later reads as "doesn't exist, mus
 Unit tests mirror the source tree: `tests/unit/techiaith/cli/test_ui.py`
 for `src/techiaith/cli/ui.py`.
 
+CLI command tests (invoking the app through `invoke_cli` / a runner) are
+**functional** tests: they live under `tests/functional/`, mirroring the package
+path the same way (`tests/functional/techiaith/epicworkmgr/test_cli.py`) — never
+under `tests/unit/` (captured 2026-07-15, techiaith-epicworkmgr).
+
 ## Mocking
 
 - Use `pytest_mock.MockerFixture` over `pytest.MonkeyPatch`
