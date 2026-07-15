@@ -279,6 +279,7 @@ in {
     playerctl
     pkgs.firefox
     pkgs.gimp-with-plugins
+    pkgs.telegram-desktop
   ]
   ++ lib.optionals isDarwin ([
     pkgs.dockutil  # Dock management tool
@@ -292,5 +293,6 @@ in {
     google-chrome
     cursor
     postman
+    telegram
   ]));
 }
