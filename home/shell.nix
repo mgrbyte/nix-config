@@ -154,6 +154,12 @@ in
         fi
       }
 
+      hm-switch() {
+        cd ${homeDir}/github/mgrbyte/nix-config || return
+        nix flake update claude-code
+        nix run home-manager -- switch --flake ".#${hmConfigName}"
+      }
+
       # Home Manager emacs update functions
       hm-emacs-update() {
         cd ${homeDir}/github/mgrbyte/nix-config || return
@@ -265,7 +271,6 @@ in
     shellAliases = {
       # Home Manager (flake-based)
       home-manager = "nix run home-manager -- --flake '${homeDir}/github/mgrbyte/nix-config'";
-      hm-switch = "nix run home-manager -- switch --flake '${homeDir}/github/mgrbyte/nix-config#${hmConfigName}'";
 
       # Ripgrep
       search = "rg -p --glob '!node_modules/*'";
