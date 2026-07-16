@@ -82,6 +82,14 @@
     keyd
   ];
 
+  # thermald: Intel thermal daemon, actively manages temps alongside power-profiles-daemon
+  services.thermald.enable = true;
+
+  # VA-API hardware video decode for Intel (i7-10510U / CML GT2)
+  hardware.graphics.extraPackages = with pkgs; [
+    intel-media-driver
+  ];
+
   nix.settings = {
     trusted-users = [ "root" "mgrbyte" ];
     extra-substituters = [ "https://claude-code.cachix.org" ];
