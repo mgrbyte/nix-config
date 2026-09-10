@@ -145,6 +145,14 @@ count threshold.
 - Only add sections when they carry information the signature doesn't — a fully-annotated
   small function usually needs the summary line only.
 - Never a docstring that merely restates the name or signature.
+- **Reader-directed, concrete prose**: say what the object *is* and what the reader should *do*
+  with it ("Acquisition projects should subclass this class to add the parameters their CLI
+  accepts"), with concrete examples over abstractions (`"cy"` and `"cym"` are equally valid).
+  Do **not** narrate application behaviour or design rationale in class/function docstrings —
+  implementation-history terms ("normalised", "the single mapping point") mean nothing to
+  readers outside the original design conversation. Design/architecture notes belong in the
+  **module** docstring or a design doc. (Captured 2026-08-18, techiaith-web-archive MR !13
+  review.)
 
 ## Data Structures
 

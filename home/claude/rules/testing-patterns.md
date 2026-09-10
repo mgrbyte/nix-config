@@ -38,7 +38,15 @@ All test methods and `call_fut`/`call_mut` must have type annotations
   reads as contract coupling; a retired one additionally hides drift (a stale-vocabulary fixture
   let a real sync-path regression through review, 2026-07-09).
 - Minimise shared state — use helpers returning local variables, not `self` attributes
-- Descriptive test method names that clarify intent
+- Descriptive test method names that clarify intent — but **terse verb-phrases, not full English
+  sentences**. Drop articles (`the`/`a`) and prepositional padding, and don't re-name the
+  subject-under-test (the test class already carries it). Prefer
+  `test_declares_primary_data_licence` / `test_counts_declared_licence_per_host` over
+  `test_manifest_declares_the_primary_data_licence` /
+  `test_records_the_declared_licence_per_host_without_detection`. (Matt, 2026-07-30: the
+  sentence-subtitle style had crept in as Claude's prevalent habit — flagged and tightened. Apply
+  to new tests; match the file's existing style when editing a pre-existing test module rather than
+  churn-renaming.)
 - No inline comments as section separators — use subclasses named accordingly
 - No unused imports (e.g. don't import `pytest` unless using fixtures/parametrize)
 
