@@ -48,6 +48,13 @@ Never route git through an MCP tool that shells out and bypasses that guard
 `shell-command`). There is no remote command execution tool — all dl6/remote git
 is the user's (see remote-dev-workflow.md).
 
+## Never Push to Personal GitHub Repos
+
+Claude never runs `git push` (any form) against a remote on `github.com/mgrbyte`. Commit
+locally and say the commit is ready to push; the push is Matt's, by hand. Check `git remote -v`
+before any push — a `~/github/mgrbyte/` checkout is the usual tell. Work remotes on
+`storfa.techiaith.cymru` keep the existing feature-branch push rules.
+
 ## Issue-First Branch & Fix-Commit Protocol
 
 Applies to every `bugfix/*` and `feature/*` branch whose work outlives the session. A fix
