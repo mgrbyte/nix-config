@@ -50,12 +50,14 @@ is the user's (see remote-dev-workflow.md).
 
 ## Issue-First Branch & Fix-Commit Protocol
 
-Applies to every `bugfix/*` and `feature/*` branch.
+Applies to every `bugfix/*` and `feature/*` branch whose work outlives the session. A fix
+diagnosed and merged in one sitting needs no tracking issue: the MR is its record, and its
+commit carries no `Fixes` footer.
 
-- **File the GitLab issue before creating the branch.** No `bugfix/*` or `feature/*`
-  branch is created until its tracking issue exists (see gitlab-tasks.md for `glab`
-  creation, placement, epic parenting, and labels). This makes the issue number `#N`
-  known before any code is written.
+- **File the GitLab issue before creating the branch** for work that spans sessions. No
+  such `bugfix/*` or `feature/*` branch is created until its tracking issue exists (see
+  gitlab-tasks.md for `glab` creation, placement, epic parenting, and labels). This makes
+  the issue number `#N` known before any code is written.
 - **Reference `Fixes #N` in the verified fix commit, before the branch is pushed.**
   Use the plain GitLab closing keyword `Fixes #N` (no parentheses) as a trailing
   footer line or a body bullet — it auto-closes the issue on merge to the default
