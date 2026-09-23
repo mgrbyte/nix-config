@@ -35,6 +35,7 @@ in {
         PATH = nixPath;
         COLORTERM = "truecolor";
         CLAUDE_TIPS_FILE = "${homeDir}/.claude/tips.txt";
+        CLAUDE_CODE_ENABLE_TODO_TOOLS = "1";
         # SSH_AUTH_SOCK inherited from launchd (macOS native ssh-agent)
       };
     };
@@ -67,6 +68,7 @@ in {
         "PATH=${nixPath}"
         "COLORTERM=truecolor"
         "CLAUDE_TIPS_FILE=${homeDir}/.claude/tips.txt"
+        "CLAUDE_CODE_ENABLE_TODO_TOOLS=1"
       ];
     };
     Install.WantedBy = [ "graphical-session.target" ];

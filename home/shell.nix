@@ -39,6 +39,9 @@ in
       # PATH - defined in default.nix (single source of truth)
       export PATH="${nixPath}"
 
+      # Claude Code: expose the TaskCreate/TaskUpdate tools
+      export CLAUDE_CODE_ENABLE_TODO_TOOLS=1
+
       # Editor
       export ALTERNATE_EDITOR=""
       export EDITOR="emacsclient -t"
