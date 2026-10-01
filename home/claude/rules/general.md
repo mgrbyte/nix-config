@@ -26,6 +26,12 @@ memories, always write the full project/package name. The shorthand is unknown t
 and to future-you, and cross-project GitLab references only resolve against the real project
 path, never a nickname.
 
+Shorthand in chat is fine (`tnc`, `cc-cy`, `ddguk`, `TDE`). The moment text is persisted it
+becomes the full name: `techiaith-nemo-curator`, `commoncrawl-cy`, `deddfwriaeth-gov-uk`,
+`text-data-explorer`. In GitLab issue and MR bodies and comments, make the first mention a
+markdown link to the repo so a reader can click through (reaffirmed 2026-09-30 after a
+tracking issue was filed with `tnc` throughout).
+
 ## No Quick Fixes
 
 Never suggest quick/hacky workarounds. Always propose the proper fix, even if it takes longer. The user prefers reproducible, correct solutions over expedient ones that accumulate technical debt.

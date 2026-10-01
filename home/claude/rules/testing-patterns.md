@@ -46,7 +46,14 @@ All test methods and `call_fut`/`call_mut` must have type annotations
   `test_records_the_declared_licence_per_host_without_detection`. (Matt, 2026-07-30: the
   sentence-subtitle style had crept in as Claude's prevalent habit — flagged and tightened. Apply
   to new tests; match the file's existing style when editing a pre-existing test module rather than
-  churn-renaming.)
+  churn-renaming.) **Budget: about three to five words after `test_`.** Name the *distinguishing
+  condition or outcome*, not the whole behaviour — the class already says what is under test, and
+  the assertion says the rest. `test_one_file_per_language`, `test_skips_missing_language`,
+  `test_ignores_cached_copy`, `test_sorted_union` — not
+  `test_downloads_one_file_per_language_into_the_cache_dir` or
+  `test_keys_hosts_by_the_host_lists_suffixes_and_records_their_versions` (Matt, 2026-10-01: the
+  sentence style recurred across a day's branches despite the 2026-07-30 note, so the budget is now
+  explicit).
 - No inline comments as section separators — use subclasses named accordingly
 - No unused imports (e.g. don't import `pytest` unless using fixtures/parametrize)
 
