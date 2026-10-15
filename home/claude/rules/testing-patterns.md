@@ -38,22 +38,22 @@ All test methods and `call_fut`/`call_mut` must have type annotations
   reads as contract coupling; a retired one additionally hides drift (a stale-vocabulary fixture
   let a real sync-path regression through review, 2026-07-09).
 - Minimise shared state — use helpers returning local variables, not `self` attributes
-- Descriptive test method names that clarify intent — but **terse verb-phrases, not full English
-  sentences**. Drop articles (`the`/`a`) and prepositional padding, and don't re-name the
-  subject-under-test (the test class already carries it). Prefer
-  `test_declares_primary_data_licence` / `test_counts_declared_licence_per_host` over
-  `test_manifest_declares_the_primary_data_licence` /
-  `test_records_the_declared_licence_per_host_without_detection`. (Matt, 2026-07-30: the
-  sentence-subtitle style had crept in as Claude's prevalent habit — flagged and tightened. Apply
-  to new tests; match the file's existing style when editing a pre-existing test module rather than
-  churn-renaming.) **Budget: about three to five words after `test_`.** Name the *distinguishing
-  condition or outcome*, not the whole behaviour — the class already says what is under test, and
-  the assertion says the rest. `test_one_file_per_language`, `test_skips_missing_language`,
-  `test_ignores_cached_copy`, `test_sorted_union` — not
-  `test_downloads_one_file_per_language_into_the_cache_dir` or
-  `test_keys_hosts_by_the_host_lists_suffixes_and_records_their_versions` (Matt, 2026-10-01: the
-  sentence style recurred across a day's branches despite the 2026-07-30 note, so the budget is now
-  explicit).
+- **Test method names follow one mechanical rule, so they are never relitigated:**
+  1. The class names the subject. The method never repeats it, nor the module.
+  2. **Happy path: name the outcome**, a present-tense verb phrase: `test_fetches_files_table`,
+     `test_verifies_before_syncing`.
+  3. **Failure path: name the condition only.** No `fails_loud`, `raises`, `refuses`, `is_rejected`:
+     the `pytest.raises` in the body says that. `test_missing_manifest`, `test_project_mismatch`.
+  4. Drop articles, prepositional padding and hedges: `the`, `a`, `its`, `with`, `on`, `when`,
+     `should`, `correctly`.
+  5. Words come from the code's own vocabulary (identifiers, error messages, parameter names), not
+     from prose. An identifier with an underscore (`record_id`, `stage_perf`) counts as one word.
+  6. Budget two to five words after `test_`. Over five means the class does too much or the name
+     narrates.
+  7. A pre-existing module is swept once, as its own commit, when a repo's suite is swept; after
+     that only new tests follow the rule, so names never churn twice. (Matt, 2026-10-15, after the
+     sentence style recurred despite the 2026-07-30 and 2026-10-01 notes; techiaith-nemo-curator
+     was swept first, 363 renames.)
 - No inline comments as section separators — use subclasses named accordingly
 - No unused imports (e.g. don't import `pytest` unless using fixtures/parametrize)
 

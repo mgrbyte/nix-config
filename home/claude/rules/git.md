@@ -96,6 +96,17 @@ commit carries no `Fixes` footer.
 - **Verify before hand-off:** `git status --short --branch` must show `X...origin/X`, not
   `X...origin/main`.
 
+## Never Force-Push an Open MR's Branch Back to a Sha That Already Ran
+
+Once a branch has an open merge request, dropping its latest commit by `git reset --hard <older>`
+and `--force-with-lease` leaves the MR stuck: GitLab's head-pipeline pointer stays on the pipeline
+of the dropped commit, no push triggers a new pipeline for a sha that already had one, and the
+merge check reports `ci_must_pass` and spins. Drop the commit with `git revert` instead, or
+re-run the merge-request pipeline by hand (`POST projects/<id>/merge_requests/<iid>/pipelines`)
+if the force-push already happened. Force-with-lease on a feature branch stays fine before the MR
+exists and when the new head is a sha GitLab has never seen (a squash or rebase). (2026-10-15,
+techiaith-nemo-curator !81.)
+
 ## Branch & Rebase Discipline
 
 - **One unit of work per branch.** If you reach for different `feat:`/`refactor:`/`fix:` prefixes to distinguish commits on a single branch, that's the signal the work should have been split into separate branches.
