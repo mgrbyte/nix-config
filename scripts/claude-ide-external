@@ -58,8 +58,10 @@ system_prompt="IMPORTANT: Connected to Emacs via claude-code-ide.el integration.
 
 IMPORTANT: At the start of each session, activate the Serena project for the working directory by calling mcp__serena__activate_project with the project path '${working_dir}'. If the project does not exist, Serena will create it. Read any relevant memories after activation."
 
-# Build command arguments
+# Build command arguments.  The initial prompt goes first: --allowedTools and
+# --add-dir take a variable number of values and would swallow it otherwise.
 cmd_args=()
+[[ -n "$colour" ]] && cmd_args+=("/color $colour")
 [[ -n "$resume" ]] && cmd_args+=("$resume")
 [[ -n "$continue_flag" ]] && cmd_args+=("$continue_flag")
 cmd_args+=(--append-system-prompt "$system_prompt")
@@ -67,7 +69,6 @@ cmd_args+=(--mcp-config "$mcp_config")
 [[ -n "$allowed_tools" ]] && cmd_args+=(--allowedTools $=allowed_tools)
 [[ -n "$extra_flags" ]] && cmd_args+=($=extra_flags)
 [[ -n "$remote_prompt" ]] && cmd_args+=(--append-system-prompt "$remote_prompt")
-[[ -n "$colour" ]] && cmd_args+=("/color $colour")
 
 # Launch Claude with env vars
 export CLAUDE_CODE_SSE_PORT="$port"
