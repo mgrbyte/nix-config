@@ -166,9 +166,9 @@ in
       # Home Manager emacs update functions
       hm-emacs-update() {
         cd ${homeDir}/github/mgrbyte/nix-config || return
-        nix flake update emacs-config --commit-lock-file
-        nix run home-manager -- switch --flake ".#${hmConfigName}"
-        git push
+        nix flake update emacs-config --commit-lock-file &&
+        nix run home-manager -- switch --flake ".#${hmConfigName}" &&
+        git push &&
         ${if pkgs.stdenv.isDarwin
           then "launchctl kickstart -k gui/$(id -u)/org.nix-community.home.emacs"
           else "systemctl --user restart emacs"}
@@ -176,9 +176,9 @@ in
 
       hm-emacs-update-dev() {
         cd ${homeDir}/github/mgrbyte/nix-config || return
-        nix flake lock --override-input emacs-config path:${homeDir}/github/mgrbyte/emacs.d --commit-lock-file
-        nix run home-manager -- switch --flake ".#${hmConfigName}"
-        git push
+        nix flake lock --override-input emacs-config path:${homeDir}/github/mgrbyte/emacs.d --commit-lock-file &&
+        nix run home-manager -- switch --flake ".#${hmConfigName}" &&
+        git push &&
         ${if pkgs.stdenv.isDarwin
           then "launchctl kickstart -k gui/$(id -u)/org.nix-community.home.emacs"
           else "systemctl --user restart emacs"}
