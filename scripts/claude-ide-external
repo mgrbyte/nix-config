@@ -5,7 +5,10 @@
 # Usage: claude-ide-external --port PORT --session-id ID --mcp-url URL
 #                            [--working-dir DIR] [--resume] [--continue]
 #                            [--allowed-tools TOOLS] [--extra-flags FLAGS]
-#                            [--remote-prompt PROMPT]
+#                            [--remote-prompt PROMPT] [--colour COLOUR]
+#
+# --colour sets the prompt-bar colour via Claude Code's /color command,
+# passed as the initial prompt (there is no persistent setting for it).
 
 set -euo pipefail
 
@@ -19,6 +22,7 @@ continue_flag=""
 allowed_tools=""
 extra_flags=""
 remote_prompt=""
+colour=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -31,6 +35,7 @@ while [[ $# -gt 0 ]]; do
         --allowed-tools) allowed_tools="$2"; shift 2 ;;
         --extra-flags) extra_flags="$2"; shift 2 ;;
         --remote-prompt) remote_prompt="$2"; shift 2 ;;
+        --colour) colour="$2"; shift 2 ;;
         *) echo "Unknown argument: $1" >&2; exit 1 ;;
     esac
 done
@@ -62,6 +67,7 @@ cmd_args+=(--mcp-config "$mcp_config")
 [[ -n "$allowed_tools" ]] && cmd_args+=(--allowedTools $=allowed_tools)
 [[ -n "$extra_flags" ]] && cmd_args+=($=extra_flags)
 [[ -n "$remote_prompt" ]] && cmd_args+=(--append-system-prompt "$remote_prompt")
+[[ -n "$colour" ]] && cmd_args+=("/color $colour")
 
 # Launch Claude with env vars
 export CLAUDE_CODE_SSE_PORT="$port"
