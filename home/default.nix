@@ -2,8 +2,8 @@
 
 let
   name = "Matt Russell";
-  isDarwin = pkgs.stdenv.isDarwin;
-  isLinux = pkgs.stdenv.isLinux;
+  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
+  isLinux = pkgs.stdenv.hostPlatform.isLinux;
   homeDir = if isDarwin then "/Users/${user}" else "/home/${user}";
 
   # PATH components - single source of truth for shell and launchd

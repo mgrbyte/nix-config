@@ -169,7 +169,7 @@ in
         nix flake update emacs-config --commit-lock-file &&
         nix run home-manager -- switch --flake ".#${hmConfigName}" &&
         git push &&
-        ${if pkgs.stdenv.isDarwin
+        ${if pkgs.stdenv.hostPlatform.isDarwin
           then "launchctl kickstart -k gui/$(id -u)/org.nix-community.home.emacs"
           else "systemctl --user restart emacs"}
       }
@@ -179,7 +179,7 @@ in
         nix flake lock --override-input emacs-config path:${homeDir}/github/mgrbyte/emacs.d --commit-lock-file &&
         nix run home-manager -- switch --flake ".#${hmConfigName}" &&
         git push &&
-        ${if pkgs.stdenv.isDarwin
+        ${if pkgs.stdenv.hostPlatform.isDarwin
           then "launchctl kickstart -k gui/$(id -u)/org.nix-community.home.emacs"
           else "systemctl --user restart emacs"}
       }
@@ -207,7 +207,7 @@ in
       # Keys are stored to keychain by age.nix loadSshKeysToAgent activation step
       # Must use /usr/bin/ssh-add (Apple's), not Nix ssh-add (no keychain support)
       # Linux: GNOME keyring daemon acts as SSH agent and handles key caching
-      ${lib.optionalString pkgs.stdenv.isDarwin ''
+      ${lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
       /usr/bin/ssh-add --apple-load-keychain 2>/dev/null
       ''}
 
@@ -289,8 +289,8 @@ in
       rg-ts = "search --type=typescript";
 
       # Clipboard aliases (macOS compatibility)
-      pbcopy = lib.mkIf pkgs.stdenv.isLinux "wl-copy";
-      pbpaste = lib.mkIf pkgs.stdenv.isLinux "wl-paste";
+      pbcopy = lib.mkIf pkgs.stdenv.hostPlatform.isLinux "wl-copy";
+      pbpaste = lib.mkIf pkgs.stdenv.hostPlatform.isLinux "wl-paste";
 
       ls = "ls --color=auto";
       ll = "ls -lh";

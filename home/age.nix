@@ -124,7 +124,7 @@ in
 
   # Load SSH keys into agent (and macOS keychain) for git signing
   # Linux uses keychain in shell.nix instead
-  home.activation.loadSshKeysToAgent = lib.mkIf pkgs.stdenv.isDarwin (
+  home.activation.loadSshKeysToAgent = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (
     lib.hm.dag.entryAfter ["generateSshPubKeys"] ''
       ${lib.optionalString (user == "mtr21pqh") "/usr/bin/ssh-add --apple-use-keychain ${homeDir}/.ssh/id_ed25519_mtr21pqh 2>/dev/null || true"}
       ${lib.optionalString (user == "mtr21pqh") "/usr/bin/ssh-add --apple-use-keychain ${homeDir}/.ssh/id_ed25519_mtr21pqh_falcon 2>/dev/null || true"}

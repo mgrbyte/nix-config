@@ -1,7 +1,7 @@
 { config, pkgs, lib, homeDir, nixPath, emacs-config, nixUserChroot ? false, ... }:
 
 let
-  isDarwin = pkgs.stdenv.isDarwin;
+  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
 in {
   # Clear stale native-compiled elisp on config change
   home.activation.clearElnCache = lib.hm.dag.entryAfter ["writeBoundary"] ''
@@ -42,7 +42,7 @@ in {
   };
 
   # Emacsclient desktop entry (Linux only; macOS uses darwin.nix createEmacsclientApp)
-  xdg.desktopEntries.emacsclient = lib.mkIf (pkgs.stdenv.isLinux) {
+  xdg.desktopEntries.emacsclient = lib.mkIf (pkgs.stdenv.hostPlatform.isLinux) {
     name = "Emacsclient";
     genericName = "Text Editor";
     comment = "Connect to Emacs daemon";
@@ -53,7 +53,7 @@ in {
   };
 
   # Emacs daemon via systemd (Linux only, not in nix-user-chroot)
-  systemd.user.services.emacs = lib.mkIf (pkgs.stdenv.isLinux && !nixUserChroot) {
+  systemd.user.services.emacs = lib.mkIf (pkgs.stdenv.hostPlatform.isLinux && !nixUserChroot) {
     Unit = {
       Description = "Emacs daemon";
       After = [ "graphical-session.target" ];

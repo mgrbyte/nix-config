@@ -1,8 +1,8 @@
 { config, pkgs, lib, ... }:
 
 let
-  copy = if pkgs.stdenv.isDarwin then "pbcopy" else "wl-copy";
-  paste = if pkgs.stdenv.isDarwin then "pbpaste" else "wl-paste";
+  copy = if pkgs.stdenv.hostPlatform.isDarwin then "pbcopy" else "wl-copy";
+  paste = if pkgs.stdenv.hostPlatform.isDarwin then "pbpaste" else "wl-paste";
 in {
   programs.tmux = {
     enable = true;

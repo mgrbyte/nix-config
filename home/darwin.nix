@@ -1,7 +1,7 @@
 { config, pkgs, lib, homeDir, ... }:
 
 let
-  isDarwin = pkgs.stdenv.isDarwin;
+  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
 in {
   # Disable copyApps - requires App Management permission which is problematic
   # Living with shortcut arrow on dock icons instead

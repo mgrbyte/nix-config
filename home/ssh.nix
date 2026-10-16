@@ -1,7 +1,7 @@
 { config, pkgs, lib, user, homeDir, nix-secrets, ... }:
 
 let
-  isLinux = pkgs.stdenv.isLinux;
+  isLinux = pkgs.stdenv.hostPlatform.isLinux;
   isWorkUser = user == "mtr21pqh";
 in {
   programs.ssh = {
@@ -61,7 +61,7 @@ in {
   # agent. Apple's launchd ssh-agent creates a fresh socket under ~/.ssh/agent
   # on start; WatchPaths turns that into the reload trigger. Must be Apple's
   # /usr/bin/ssh-add — the nix ssh-add has no Keychain support.
-  launchd.agents.ssh-load-keychain = lib.mkIf pkgs.stdenv.isDarwin {
+  launchd.agents.ssh-load-keychain = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
     enable = true;
     config = {
       ProgramArguments = [ "/usr/bin/ssh-add" "--apple-load-keychain" ];

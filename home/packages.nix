@@ -1,7 +1,7 @@
 { config, pkgs, lib, inputs, emacs-abyss-theme, emacs-tokyo-theme, ... }:
 let
-  isDarwin = pkgs.stdenv.isDarwin;
-  isLinux = pkgs.stdenv.isLinux;
+  isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
+  isLinux = pkgs.stdenv.hostPlatform.isLinux;
   casks = inputs.nix-casks.packages.${pkgs.stdenv.hostPlatform.system};
 
   # Cross-platform GUI apps: listed separately per platform to avoid
