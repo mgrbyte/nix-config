@@ -16,6 +16,11 @@ Do NOT skip this gate. Do NOT combine research and implementation in the same st
 - Debugging unfamiliar code or libraries
 - Any task touching libraries, APIs, or codebases you haven't verified in this session
 - Any task where you'd need to assume how something works
+- Any design session (a grill or plan). The research summary is presented first, with the
+  prior-art section filled in, and the design questions start only after the user has seen
+  it. Prior art is looked for in this order: the framework and libraries already in use, the
+  sibling packages in the same organisation, then package registries and the wider web.
+  Rolling our own is the last option, and the summary says why the found art does not fit.
 
 ## When You Can Skip
 
